@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>個人計畫書：優惠精算師 — 台灣旅遊規劃網頁專案</title>
+  <style>
+    :root {
+      --bg-canvas: #f4f4f0;
+      --bg-surface: #ffffff;
+      --bg-subtle: #fafaf7;
+      --border-subtle: #e2e1db;
+      --border-hover: #cbcaca;
+      --accent-primary: #d97706;
+      --accent-hover: #b45309;
+      --accent-soft: #fffbeb;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #78716c;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-shell {
+      min-height: 100dvh;
+      padding: 20px 16px max(48px, env(safe-area-inset-bottom));
+    }
+
+    .top-nav {
+      max-width: 820px;
+      margin: 0 auto 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 8px 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      touch-action: manipulation;
+      transition: border-color 140ms ease-out, background-color 140ms ease-out, transform 80ms ease-out;
+    }
+    .nav-link:hover { border-color: var(--border-hover); background: var(--bg-subtle); }
+    .nav-link:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .nav-link:active { transform: scale(0.97); }
+    .nav-link.is-active {
+      border-color: var(--accent-primary);
+      background: var(--accent-soft);
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .nav-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .doc-surface {
+      max-width: 820px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: clamp(20px, 4vw, 44px);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      margin: 32px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 10px 0;
+      color: var(--text-secondary);
+      max-width: 72ch;
+    }
+
+    strong { color: var(--text-primary); font-weight: 600; }
+
+    a {
+      color: var(--accent-hover);
+      text-underline-offset: 3px;
+      font-weight: 500;
+    }
+    a:hover { color: var(--accent-primary); }
+    a:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; border-radius: 3px; }
+
+    blockquote {
+      margin: 16px 0;
+      padding: 12px 16px;
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent-primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border-subtle);
+      margin: 28px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0;
+      padding-left: 22px;
+      color: var(--text-secondary);
+    }
+    li { margin: 6px 0; }
+    li > ul { margin-top: 4px; }
+
+    code {
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.88em;
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #1c1917;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.925rem;
+      font-variant-numeric: tabular-nums;
+      background: var(--bg-surface);
+    }
+    th, td {
+      padding: 11px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    thead th {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .diagram-wrap {
+      margin: 18px 0;
+      padding: 16px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    .code-card {
+      margin: 16px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      background: #efefe9;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .code-lang {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: var(--accent-primary);
+      color: #ffffff;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      transition: background-color 140ms ease-out, transform 80ms ease-out;
+    }
+    .copy-btn:hover { background: var(--accent-hover); }
+    .copy-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .copy-btn:active { transform: scale(0.97); }
+    .copy-btn.is-copied { background: #15803d; }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #1c1917;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nav-link, .copy-btn { transition: none; }
+      .nav-link:active, .copy-btn:active { transform: none; }
+    }
+
+    @media print {
+      body { background: #ffffff; }
+      .top-nav, .copy-btn { display: none !important; }
+      .doc-surface { border: 0; padding: 0; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav class="top-nav" aria-label="計畫書快速切換">
+      <div class="nav-group">
+        <a class="nav-link " href="./master_project_plan.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>團隊總計畫書</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <a class="nav-link " href="./plan_architect.html">架構師</a>
+        <a class="nav-link " href="./plan_route_intel.html">路線情報員</a>
+        <a class="nav-link is-active" href="./plan_fare_planner.html">優惠精算師</a>
+        <a class="nav-link " href="./plan_ui_designer.html">介面設計師</a>
+      </div>
+    </nav>
+
+    <main class="doc-surface">
+      <h1>個人計畫書：優惠精算師</h1>
+<blockquote><strong>你的定位</strong>：你是整個專案的<strong>優惠精算師</strong>。台灣交通優惠多、週五六與連假房價落差大、一家老小出門更常碰到「誰該出多少錢」與「星期幾休息別白跑」的問題——整套產品真正讓旅客覺得比去趣、Funliday 聰明的邏輯大腦，全在你這條產線上。</blockquote>
+<hr />
+<h2>一、你的專屬主場與邊界</h2>
+<ul><li><strong>你掌控的目錄</strong>：<code>engine/</code></li><li><strong>完全獨立的作業環境</strong>：所有運算都是純 TypeScript 函式（輸入資料 $\rightarrow$ 輸出完整 <code>TripPlanResult</code>），完全不需要碰網頁 CSS、也不用自己寫網路連線程式。</li><li><strong>順手幫全隊減壓的認領項</strong>：等路線情報員從 TDX 產出 5 區景點初稿後，你認領 <strong>1–2 區（例如小琉球＋花東）</strong>，幫這些點補上準確的公休日、室內雨備與長輩推車友善標籤。</li></ul>
+<hr />
+<h2>二、你真正要動腦的地方（AI 不能替你決定）</h2>
+<ol><li><strong>多重優惠「互斥與配對」的決策樹</strong>：</li></ol>
+<p>高鐵大學生 5 折跟早鳥 65 折不能併用、愛心票「每組限 1 位必要陪伴者」半價、Taiwan PASS 臺鐵版要玩滿幾天／跨幾段才比單買早鳥划算——這些商業邏輯必須由你設計清楚的優先順序，讓系統幫旅客挑「真正最省的那組」並講出白話理由。</p>
+<ol><li><strong>平假日／連假住宿係數與「改平日提醒」門檻</strong>：</li></ol>
+<p>結合 <code>data/holidays.json</code>，週五、週六與連假房價通常比平日貴不少。你要拿捏各住宿等級（<code>budget / standard / premium</code>）的合理倍率，以及「大概省超過多少錢（例如每人省 NT$ 600 以上）才主動跳出建議改期提示」，才不會一點點差價也一直吵使用者。</p>
+<ol><li><strong>離島與多代同遊的「人性化緩衝」</strong>：</li></ol>
+<p>帶著 65 歲以上長輩或未滿 3 歲幼兒時，不僅要自動切保守步調（每日 ≤ 3–4 點、優先選汽車／台灣好行而非全島騎機車），在離島最後一天的<strong>回程搭船／搭機前一定要預留充足緩衝</strong>，絕不能把緊鄰碼頭關門前的時間排滿景點。</p>
+<ol><li><strong>使用者按「換一個景點」時的即時重算邏輯</strong>：</li></ol>
+<p>介面設計師會有換點、調順序、切雨備的按鈕，你要寫出乾淨的純函式，讓畫面一按就能秒重算門到門時間、預算差額與公休日衝突。</p>
+<hr />
+<h2>三、目前蒐集好供你運用的工具與參考資產</h2>
+<div class="table-scroll"><table><thead><tr><th>工具 / Skill</th><th>來源與用途</th><th>實戰關鍵點</th></tr></thead><tbody><tr><td><strong>工作區已載入旅遊邏輯</strong><br><code>.agents/skills/trip-go/</code>、<code>trip-review/</code></td><td>裡面有非常細的<strong>門到門時間公式</strong>、<strong>興趣時間軸骨架</strong>與 <strong>22 項自動抓錯清單</strong></td><td>不要照抄「簽證／護照／時差」等出國規則，改把<strong>星期衝突、營業時間、轉乘緩衝、預算加總檢查</strong>抽出來寫成台灣純函式。</td></tr><tr><td><strong>專案共用合約 Skill</strong><br><code>.agents/skills/tw-trip-contract/SKILL.md</code></td><td>確保你的輸出 100% 符合 <code>TripPlanResult</code> 結構</td><td>特別確認 <code>BudgetBreakdown</code> 內的 <code>perIdentitySplit</code> 與 <code>ReviewWarning</code> 欄位齊全。</td></tr><tr><td><strong><code>test-driven-development</code> 思維 + <code>Vitest</code></strong></td><td>先列出台灣最容易算錯的邊界題（例如出發前第 4 天 vs 第 5 天早鳥切換），再寫程式把測試全變綠燈</td><td>每改一個折價條件就多補一筆案例，永遠不怕改壞舊規則。</td></tr><tr><td><strong>政府辦公日曆表 (<code>data/holidays.json</code>) ＋ <code>promotions.json</code></strong></td><td>精準判別某天是平日、週五六還是國定連假</td><td>搭配國旅補助規則表，自動計算可折抵項目。</td></tr></tbody></table></div>
+<hr />
+<h2>四、你的工作節奏與自我檢查清單</h2>
+<ol><li><strong>前置準備</strong>：從 <code>main</code> 開出個人分支 <code>feat/fare-engine-core</code>，對照 <code>schema/trip.ts</code> 讀懂新的 <code>TripInput</code>（含 <code>origin</code>、<code>lodgingTier</code>）與 <code>TripPlanResult</code>。</li><li><strong>升級優惠與分帳引擎（<code>engine/pricing.ts</code>）</strong>：<ul><li>依 <code>origin</code> 自動對應最近高鐵／台鐵樞紐站及合理離島機場／港口。</li><li>實作高鐵（5–28 天早鳥、大學生、敬老 5 折、愛心 1+1 半價）、台鐵、離島（居民 7 折、離島回程機票免營業稅、客輪 3–12 歲半價／未滿 3 歲 1 成保險票）與 Taiwan PASS / TPASS 比價。</li><li>新增 <strong>住宿平假日與連假估算</strong>（吃 <code>data/holidays.json</code>），算出 <code>weekdayShiftSavingHint</code>（例：「若往前 1 天週四出發，全團住宿估計可省 NT$ 2,400」）。</li><li>新增 <strong>同團各身分個別分帳 <code>perIdentitySplit</code></strong>（交通依身分各自計價、住宿依房間數均攤、租車／共同門票平分）。</li></ul></li><li><strong>升級分段排程與按鈕微調函式（<code>engine/planner.ts</code> &amp; <code>engine/mutations.ts</code>）</strong>：<ul><li>依 <code>TripInput</code> 組出每日 <code>DayPlan</code>，強制加上車站／機場／港口門到門緩衝時間。</li><li>實作 <strong>3 個給前端按鈕呼叫的純函式</strong>：<code>replaceStopWithNearbyBackup()</code>（換一個同區順路未重複且沒公休的點）、<code>reorderDayStops()</code>（上下調順序後重算時間與 Google Maps 路線 URL）、<code>toggleRainBackup()</code>（遇黃紅燈或點切換時替換為 <code>isIndoor: true</code> 備案）。</li></ul></li><li><strong>品質抓錯與外帶輸出產生器（<code>engine/reviewer.ts</code> &amp; <code>engine/exporters.ts</code>）</strong>：<ul><li><code>reviewer.ts</code>：自動檢查每日星期與 <code>closedDays</code> 衝突、前後站轉乘過緊、超預算與海象風險警告。</li><li><code>exporters.ts</code>：產生每日 <strong>Google Maps 多點導航連結</strong>（<code>https://www.google.com/maps/dir/...</code>）與標準 RFC 5545 <strong><code>.ics</code> 行事曆字串</strong>（純文字產生，零瀏覽器依賴）。</li></ul></li><li><strong>自我確認再發 PR</strong>：跑通所有邊界測試（至少 10 個），確認只改動 <code>engine/</code> 與自己認領的精選資料後發 Pull Request。</li></ol>
+<hr />
+<h2>五、直接貼給優惠精算師 AI 的執行指令</h2>
+<div class="code-card"><div class="code-header"><span class="code-lang">可直接複製給 AI 的執行指令</span><button type="button" class="copy-btn" data-copy-target="code-block-1" aria-label="複製內容"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>一鍵複製</span></button></div><pre><code id="code-block-1">你是我的協作 AI，負責「優惠精算師（台灣優惠規則、AA 分帳與排程引擎）」開發工作。請先閱讀專案根目錄的 AGENTS.md、.agents/skills/tw-trip-contract/SKILL.md，並參考 .agents/skills/trip-go 與 trip-review 內的抓錯思路。嚴格遵守以下規範：
+
+1. 【目錄與純函式紀律】
+   - 只在 engine/ 目錄內建立與修改檔案，絕對不要修改 schema/、services/ 或 src/。
+   - engine/ 內所有函式必須為純函式（Pure Functions），嚴禁直接呼叫 fetch()、localStorage 或操作 DOM；景點清單、假日表、海象與票價皆透過參數傳入。
+   - 輸入與輸出嚴格符合 schema/trip.ts 的 TripInput 與 TripPlanResult。
+
+2. 【出發地、同團優惠、住宿係數與 AA 分帳 (engine/pricing.ts)】
+   - 依 TripInput.origin 自動對應最近雙鐵站與往返離島的合理港口/機場組合。
+   - 實作同團混合身分交通計價：高鐵早鳥窗（5–28天）、大學生優惠、65歲敬老5折、愛心票（每組限本人+1位陪伴者半價）、離島設籍居民約7折、離島回程機票免營業稅、客輪 3–12 歲半價與未滿 3 歲 1 成保險票；並與 Taiwan PASS / TPASS 比價擇優推薦。
+   - 結合傳入的政府辦公日曆表（holidays.json），依 lodgingTier 與 roomCount 計算平日 vs 週五六/連假住宿費；若週五六/連假佔比高，估算「往前或往後挪一天改平日出發」的 weekdayShiftSavingHint。
+   - 產出完整的 BudgetBreakdown，包含各身分別每人應付分帳明細 perIdentitySplit（交通依身分實付、住宿與租車依成人/佔床人數均攤）。
+
+3. 【分段排程與按鈕微調純函式 (engine/planner.ts &amp; engine/mutations.ts)】
+   - 組合每日 DayPlan（含門到門時間緩衝：雙鐵+20分、國內機/離島船+45分）。
+   - 若含 senior65Plus &gt; 0 或 infantUnder3 &gt; 0，切換友善步調（每日 &lt;= 3–4 個點、避開全島機車、優先挑選 wheelchairAndStrollerFriendly: true）。
+   - 實作三個純函式供前端單點微調並回傳更新後的 TripPlanResult：
+     (a) replaceStopWithNearbyBackup(plan, dayIndex, stopId, candidateSpots)
+     (b) reorderDayStops(plan, dayIndex, fromIndex, toIndex)
+     (c) toggleRainBackup(plan, dayIndex, useBackup)
+
+4. 【自動抓錯與外帶匯出 (engine/reviewer.ts &amp; engine/exporters.ts)】
+   - reviewer.ts：檢查星期與 closedDays 衝突、轉乘緩衝不足、預算超標（isOverBudget）與海象警示，輸出 ReviewWarning[]。
+   - exporters.ts：為每日生成 Google Maps 多點路線連結 googleMapsRouteUrl，並實作 generateIcsCalendar(plan: TripPlanResult): string（標準 .ics 格式純文字）。
+
+5. 【自我檢查測試】
+   - 使用 Vitest 撰寫至少 10 個涵蓋邊界情境的單元測試（包含：第 4 天 vs 第 5 天高鐵早鳥、愛心陪伴名額上限、連假住宿係數與平日省錢建議、不同身分 AA 分帳加總相等驗證、週一公休閃避、海象紅燈切雨備、單點替換不重複且即時重算預算、.ics 字串含 VEVENT 與正確日期），執行 `npx vitest run engine/` 確保 100% 通過。</code></pre></div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      var copySvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+
+      function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('data-copy-target');
+          var el = document.getElementById(targetId);
+          if (!el) return;
+          var text = el.textContent || '';
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
+          } else {
+            fallbackCopy(text);
+          }
+          btn.classList.add('is-copied');
+          btn.innerHTML = checkSvg + '<span>已複製</span>';
+          setTimeout(function () {
+            btn.classList.remove('is-copied');
+            btn.innerHTML = copySvg + '<span>一鍵複製</span>';
+          }, 1800);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

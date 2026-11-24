@@ -1,0 +1,33 @@
+# Dependencies & builds
+node_modules/
+dist/
+dist-ssr/
+dev-dist/
+*.tsbuildinfo
+
+# Local environment & secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Python & FastAPI gateway
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+
+# Test & coverage outputs
+coverage/
+.vitest/
+playwright-report/
+test-results/
+
+# OS & editor junk
+.DS_Store
+Thumbs.db
+
+# Local distribution archive
+taiwan-trip-plans.zip

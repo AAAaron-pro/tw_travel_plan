@@ -1,0 +1,6 @@
+# 保護共用合約、CI/CD 與主機閘道目錄
+# 團隊夥伴加入後，可視需要再補入各自負責路徑的 GitHub 帳號
+
+/schema/    @AAAaron-pro
+/.github/   @AAAaron-pro
+/gateway/   @AAAaron-pro

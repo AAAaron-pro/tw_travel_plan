@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>個人計畫書：路線情報員 — 台灣旅遊規劃網頁專案</title>
+  <style>
+    :root {
+      --bg-canvas: #f4f4f0;
+      --bg-surface: #ffffff;
+      --bg-subtle: #fafaf7;
+      --border-subtle: #e2e1db;
+      --border-hover: #cbcaca;
+      --accent-primary: #d97706;
+      --accent-hover: #b45309;
+      --accent-soft: #fffbeb;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #78716c;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-shell {
+      min-height: 100dvh;
+      padding: 20px 16px max(48px, env(safe-area-inset-bottom));
+    }
+
+    .top-nav {
+      max-width: 820px;
+      margin: 0 auto 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 8px 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      touch-action: manipulation;
+      transition: border-color 140ms ease-out, background-color 140ms ease-out, transform 80ms ease-out;
+    }
+    .nav-link:hover { border-color: var(--border-hover); background: var(--bg-subtle); }
+    .nav-link:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .nav-link:active { transform: scale(0.97); }
+    .nav-link.is-active {
+      border-color: var(--accent-primary);
+      background: var(--accent-soft);
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .nav-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .doc-surface {
+      max-width: 820px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: clamp(20px, 4vw, 44px);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      margin: 32px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 10px 0;
+      color: var(--text-secondary);
+      max-width: 72ch;
+    }
+
+    strong { color: var(--text-primary); font-weight: 600; }
+
+    a {
+      color: var(--accent-hover);
+      text-underline-offset: 3px;
+      font-weight: 500;
+    }
+    a:hover { color: var(--accent-primary); }
+    a:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; border-radius: 3px; }
+
+    blockquote {
+      margin: 16px 0;
+      padding: 12px 16px;
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent-primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border-subtle);
+      margin: 28px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0;
+      padding-left: 22px;
+      color: var(--text-secondary);
+    }
+    li { margin: 6px 0; }
+    li > ul { margin-top: 4px; }
+
+    code {
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.88em;
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #1c1917;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.925rem;
+      font-variant-numeric: tabular-nums;
+      background: var(--bg-surface);
+    }
+    th, td {
+      padding: 11px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    thead th {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .diagram-wrap {
+      margin: 18px 0;
+      padding: 16px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    .code-card {
+      margin: 16px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      background: #efefe9;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .code-lang {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: var(--accent-primary);
+      color: #ffffff;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      transition: background-color 140ms ease-out, transform 80ms ease-out;
+    }
+    .copy-btn:hover { background: var(--accent-hover); }
+    .copy-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .copy-btn:active { transform: scale(0.97); }
+    .copy-btn.is-copied { background: #15803d; }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #1c1917;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nav-link, .copy-btn { transition: none; }
+      .nav-link:active, .copy-btn:active { transform: none; }
+    }
+
+    @media print {
+      body { background: #ffffff; }
+      .top-nav, .copy-btn { display: none !important; }
+      .doc-surface { border: 0; padding: 0; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav class="top-nav" aria-label="計畫書快速切換">
+      <div class="nav-group">
+        <a class="nav-link " href="./master_project_plan.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>團隊總計畫書</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <a class="nav-link " href="./plan_architect.html">架構師</a>
+        <a class="nav-link is-active" href="./plan_route_intel.html">路線情報員</a>
+        <a class="nav-link " href="./plan_fare_planner.html">優惠精算師</a>
+        <a class="nav-link " href="./plan_ui_designer.html">介面設計師</a>
+      </div>
+    </nav>
+
+    <main class="doc-surface">
+      <h1>個人計畫書：路線情報員</h1>
+<blockquote><strong>你的定位</strong>：你是整個專案的<strong>路線情報員</strong>。全台灣雙鐵與國內線班表、離島海象潮汐、小琉球與綠島的民營交通船資料、加上政府官方連假行事曆——這些決定「行程排得成不成立」的真實世界情報，全都由你負責打通並整理成穩定可靠的資料流。</blockquote>
+<hr />
+<h2>一、你的專屬主場與工作減壓設計</h2>
+<ul><li><strong>你掌控的目錄</strong>：<code>services/</code>、<code>data/</code></li><li><strong>這次特別幫你卸下重擔的調整</strong>：<ul><li>先前我們發現一個人手寫 5 區共 60–75 筆精選景點太操勞了。現在改成<strong>你寫一支腳本先從 TDX 觀光 V2.1 撈出 5 區的初稿骨架</strong>，接著<strong>全隊 4 個人各自認領 1–2 區</strong>填「公休日、室內雨備、無障礙與避雷提醒」，你只需人工精修自己認領的 1 區（例如澎湖）就好！</li><li>只要守住 <code>schema/trip.ts</code> 定義的輸出格式，Proxy 怎麼寫、KV 怎麼設定過期時間、船班備援怎麼排版，完全由你做主。</li></ul></li></ul>
+<hr />
+<h2>二、你真正要動腦的地方（AI 不能替你決定）</h2>
+<ol><li><strong>破解 TDX 免費「5 次／分鐘」限流陷阱</strong>：</li></ol>
+<p>TDX 免費一般會員全帳號每分鐘只能打 <strong>5 次</strong> API（取 Token 限 20 次/分），而且 Cloudflare Worker 的記憶體變數不會跨機房共享。你必須想清楚「<strong>哪些資料交給 GitHub Actions 每天慢慢抓好存成靜態 JSON</strong>（間隔 ≥ 15 秒才不會 429）」，「<strong>哪些資料放進 Cloudflare KV 讓全台灣所有使用者共用同一份快取</strong>」。</p>
+<ol><li><strong>訂定台灣各海域合理的海象燈號門檻</strong>：</li></ol>
+<p>東北季風下的「基隆–馬祖」跟「東港–小琉球」耐浪程度完全不同。你需要參考航港局與實際經驗，決定浪高幾公尺或風力幾級才轉黃燈／紅燈，既能保命又不至於晴天也誤報停航。</p>
+<ol><li><strong>民營離島船班的更新與免責提醒</strong>：</li></ol>
+<p>小琉球、綠島、蘭嶼的假日機動加班船常常不在 TDX 裡。你要決定 <code>ferry-fallback.json</code> 怎麼附上最直達的船公司公告頁或航港局即時連結，讓旅客出門前點一下就能複查。</p>
+<hr />
+<h2>三、目前蒐集好供你運用的工具與 GitHub Skills</h2>
+<div class="table-scroll"><table><thead><tr><th>工具 / Skill</th><th>用途與實際做法</th><th>實戰避雷提醒</th></tr></thead><tbody><tr><td><strong>TDX 運輸資料流通服務平台</strong> (<code>tdx.transportdata.tw</code>)</td><td>• 軌道（高鐵／台鐵定期＋近 45–60 天時刻與票價）<br>• 國內航空（澎/金/馬/綠/蘭班表與 FIDS）<br>• 觀光 V2.1（合法旅宿與景點骨架）</td><td>1. 免費版限 <strong>5 次/分</strong>。<br>2. Access Token 一定要寫進 <strong>Cloudflare KV</strong>（快取 4–6 小時），嚴禁每次查詢重拿 Token。</td></tr><tr><td><strong>中央氣象署 Open Data API</strong> (<code>opendata.cwa.gov.tw</code>)</td><td>• <code>F-C0032-001</code> / <code>F-D0047-*</code>（鄉鎮天氣）<br>• <code>F-A0021-001</code>（潮汐預報）<br>• <code>F-A0020-001</code>（海域波浪預報）</td><td>透過 Worker ＋ KV 快取（建議每 <strong>3 小時</strong> 更新一次即可），大幅減少重複請求與延遲。</td></tr><tr><td><strong>政府資料開放平台 (<code>data.gov.tw</code>) 辦公日曆表</strong></td><td>同步最新「政府行政機關辦公日曆表」JSON 存入 <code>data/holidays.json</code></td><td>讓優惠精算師直接靠這份表判斷台灣國定連假與補班日，完全不用猜。</td></tr><tr><td><strong>Cloudflare Workers ＋ Cloudflare KV（免費方案）</strong></td><td>藏住 TDX / CWA 金鑰、提供 CORS 保護，並靠 KV 實現跨節點共用快取</td><td>KV 免費額度每日 10 萬次讀取，對我們來說非常充裕；當日航運開停航建議設 <strong>15 分鐘</strong> 快取。</td></tr><tr><td><strong><code>@cloudflare/vitest-pool-workers</code></strong></td><td>讓你在本機直接模擬測試 Cloudflare Worker 與 KV 讀寫</td><td>寫完路由直接跑單元測試，不用每次 deploy 上雲端才發現 KV 寫錯 key。</td></tr><tr><td><strong><code>cloudflare/security-audit-skill</code></strong>（GitHub）</td><td>從 GitHub 安裝前先用 <code>skill-security-guard</code> 掃描，接著用來檢查 Worker 安全性</td><td>特別檢查 CORS 是否只放行 GitHub Pages 網域，以及對外錯誤訊息是否藏好內部金鑰。</td></tr></tbody></table></div>
+<hr />
+<h2>四、你的工作節奏與自我檢查清單</h2>
+<ol><li><strong>前置準備</strong>：註冊 TDX 與氣象署免費開發者帳號；建立 Cloudflare Worker ＋ 綁定一個 KV Namespace；從 <code>main</code> 開出個人分支 <code>feat/route-intel-pipeline</code>。</li><li><strong>搭建 GitHub Actions 慢速靜態同步（<code>services/scripts/</code>）</strong>：<ul><li>寫腳本每日定時抓雙鐵時刻骨架、國內航空季班表、TDX 觀光 V2.1 合法旅宿與長尾景點、以及政府行政機關辦公日曆表。</li><li><strong>強制加上請求間隔（<code>sleep &gt;= 15000ms</code>）與 429 指數退避重試</strong>，確保免費帳號天天穩穩同步不中斷。</li><li>順手把 5 區（澎湖、小琉球、北北基、台南、花東）從 TDX 觀光 V2.1 抓出初稿骨架放到 <code>data/curated/drafts/</code>，發給全隊 4 人各自認領校對後彙整進 <code>data/curated/</code>。</li></ul></li><li><strong>搭建 Cloudflare Worker ＋ KV 快取代理（<code>services/proxy-worker/</code>）</strong>：<ul><li>提供 <code>/api/weather</code>（3 小時 KV 快取）、<code>/api/marine</code>（15 分鐘 KV 快取）、<code>/api/air</code>（15 分鐘 KV 快取）、<code>/api/rail-live</code>（10 分鐘 KV 快取），Token 獨立存 KV（4–6 小時）。</li></ul></li><li><strong>補齊離島民營船表與優惠規則檔（<code>data/</code>）</strong>：<ul><li>整理 <code>data/ferry-fallback.json</code>（含小琉球東琉線、綠島、蘭嶼、澎湖重要航線與官網查驗連結）及 <code>data/promotions.json</code>。</li></ul></li><li><strong>封裝主機雙任務與 <code>Zod</code> 安全降級（<code>services/ai-client/</code>）</strong>：<ul><li>封裝 <code>parseNaturalQuery()</code> 與 <code>fetchAiSummary()</code>：一旦主機離線、逾時（10 秒）、收到 <code>429</code>，或 <strong>回傳 JSON 沒通過 <code>Zod</code> 驗證</strong>，立刻平順回傳降級結果讓純規則引擎接手。</li></ul></li><li><strong>自我確認再發 PR</strong>：跑通 Vitest / Workers 測試全綠燈，確認只修改 <code>services/</code> 與 <code>data/</code> 後提交 PR。</li></ol>
+<hr />
+<h2>五、直接貼給路線情報員 AI 的執行指令</h2>
+<div class="code-card"><div class="code-header"><span class="code-lang">可直接複製給 AI 的執行指令</span><button type="button" class="copy-btn" data-copy-target="code-block-1" aria-label="複製內容"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>一鍵複製</span></button></div><pre><code id="code-block-1">你是我的協作 AI，負責「路線情報員（外部資料與 API 管線）」開發工作。請先閱讀專案根目錄的 AGENTS.md 與 .agents/skills/tw-trip-contract/SKILL.md，並嚴格遵守以下規範：
+
+1. 【目錄與合約邊界】
+   - 只在 services/ 與 data/ 目錄內建立與修改檔案，絕對不要更動 schema/、engine/ 或 src/。
+   - 所有輸出資料必須嚴格 import 並符合 schema/trip.ts 定義的型別（包含 CuratedSpot, TransportLeg, SeaRiskLevel）。
+
+2. 【破解 TDX 5 次/分限流：GitHub Actions 慢速預抓 (services/scripts/)】
+   - 撰寫 sync-tdx-static.ts 與 sync-holidays.ts：
+     (a) 每次呼叫 TDX API 之間必須強制等待至少 15 秒（&gt;= 15000ms），遇到 HTTP 429 需自動退避重試，以符合 TDX 免費會員 5 次/分鐘限制。
+     (b) 將雙鐵常用班表骨架、國內線定期班表、TDX Tourism V2.1 合法旅宿與延伸景點同步至 data/static/。
+     (c) 另寫一個腳本將首批 5 區（penghu, xiaoliuqiu, taipei, tainan, hualien_taitung）觀光 V2.1 資料轉成帶有空白 closedDays / isIndoor / tips 欄位的初稿 JSON（data/curated/），方便團隊 4 人分區校對。
+     (d) 同步台灣政府行政機關辦公日曆表至 data/holidays.json。
+
+3. 【Cloudflare Worker + KV 共用快取 (services/proxy-worker/)】
+   - 使用 Cloudflare KV Binding 實現跨節點共用快取，禁止只用記憶體變數快取 Token。
+   - TDX OAuth 2.0 Access Token 存入 KV 快取 4 小時。
+   - 實作端點與對應 KV TTL：/api/weather (3 小時，整合 CWA 鄉鎮預報 + 潮汐 F-A0021-001 + 波浪 F-A0020-001 並轉換成 SeaRiskLevel)、/api/marine (15 分鐘)、/api/air (15 分鐘)、/api/rail-live (10 分鐘)。
+   - CORS 僅允許指定的 GitHub Pages 網域，所有金鑰由 Worker Secrets 讀取。
+
+4. 【離島船班備援與優惠清單 (data/)】
+   - 建立 data/ferry-fallback.json（涵蓋小琉球東琉線、綠島、蘭嶼、澎湖等表定班次、全半票價與官網確認 sourceUrl）。
+   - 建立 data/promotions.json 記錄 Taiwan PASS、TPASS 與可配置之國旅補助規則骨架。
+
+5. 【主機雙任務呼叫與 Zod 降級保護 (services/ai-client/)】
+   - 封裝 parseNaturalQuery(text, timeoutMs = 10000) 與 fetchAiSummary(result, timeoutMs = 10000)。
+   - 收到回傳後必須先跑 Zod Schema 驗證；只要逾時、斷線、HTTP 429 或 Zod 驗證失敗，立刻安全捕捉並回傳 { status: &#x27;fallback&#x27;, reason }。
+
+6. 【自我檢查測試】
+   - 使用 Vitest（並以 @cloudflare/vitest-pool-workers 或 mock KV/fetch）測試：TDX 429 退避、KV 快取命中不重複打 TDX、CWA 波浪轉 SeaRiskLevel 門檻、以及 AI 逾時/Zod 失敗自動降級。全部測試通過後再收尾。</code></pre></div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      var copySvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+
+      function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('data-copy-target');
+          var el = document.getElementById(targetId);
+          if (!el) return;
+          var text = el.textContent || '';
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
+          } else {
+            fallbackCopy(text);
+          }
+          btn.classList.add('is-copied');
+          btn.innerHTML = checkSvg + '<span>已複製</span>';
+          setTimeout(function () {
+            btn.classList.remove('is-copied');
+            btn.innerHTML = copySvg + '<span>一鍵複製</span>';
+          }, 1800);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

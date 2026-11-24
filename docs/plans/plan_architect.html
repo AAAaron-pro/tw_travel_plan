@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>個人計畫書：架構師 — 台灣旅遊規劃網頁專案</title>
+  <style>
+    :root {
+      --bg-canvas: #f4f4f0;
+      --bg-surface: #ffffff;
+      --bg-subtle: #fafaf7;
+      --border-subtle: #e2e1db;
+      --border-hover: #cbcaca;
+      --accent-primary: #d97706;
+      --accent-hover: #b45309;
+      --accent-soft: #fffbeb;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #78716c;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-shell {
+      min-height: 100dvh;
+      padding: 20px 16px max(48px, env(safe-area-inset-bottom));
+    }
+
+    .top-nav {
+      max-width: 820px;
+      margin: 0 auto 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 8px 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      touch-action: manipulation;
+      transition: border-color 140ms ease-out, background-color 140ms ease-out, transform 80ms ease-out;
+    }
+    .nav-link:hover { border-color: var(--border-hover); background: var(--bg-subtle); }
+    .nav-link:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .nav-link:active { transform: scale(0.97); }
+    .nav-link.is-active {
+      border-color: var(--accent-primary);
+      background: var(--accent-soft);
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .nav-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .doc-surface {
+      max-width: 820px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: clamp(20px, 4vw, 44px);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      margin: 32px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 10px 0;
+      color: var(--text-secondary);
+      max-width: 72ch;
+    }
+
+    strong { color: var(--text-primary); font-weight: 600; }
+
+    a {
+      color: var(--accent-hover);
+      text-underline-offset: 3px;
+      font-weight: 500;
+    }
+    a:hover { color: var(--accent-primary); }
+    a:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; border-radius: 3px; }
+
+    blockquote {
+      margin: 16px 0;
+      padding: 12px 16px;
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent-primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border-subtle);
+      margin: 28px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0;
+      padding-left: 22px;
+      color: var(--text-secondary);
+    }
+    li { margin: 6px 0; }
+    li > ul { margin-top: 4px; }
+
+    code {
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.88em;
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #1c1917;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.925rem;
+      font-variant-numeric: tabular-nums;
+      background: var(--bg-surface);
+    }
+    th, td {
+      padding: 11px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    thead th {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .diagram-wrap {
+      margin: 18px 0;
+      padding: 16px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    .code-card {
+      margin: 16px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      background: #efefe9;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .code-lang {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: var(--accent-primary);
+      color: #ffffff;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      transition: background-color 140ms ease-out, transform 80ms ease-out;
+    }
+    .copy-btn:hover { background: var(--accent-hover); }
+    .copy-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .copy-btn:active { transform: scale(0.97); }
+    .copy-btn.is-copied { background: #15803d; }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #1c1917;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nav-link, .copy-btn { transition: none; }
+      .nav-link:active, .copy-btn:active { transform: none; }
+    }
+
+    @media print {
+      body { background: #ffffff; }
+      .top-nav, .copy-btn { display: none !important; }
+      .doc-surface { border: 0; padding: 0; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav class="top-nav" aria-label="計畫書快速切換">
+      <div class="nav-group">
+        <a class="nav-link " href="./master_project_plan.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>團隊總計畫書</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <a class="nav-link is-active" href="./plan_architect.html">架構師</a>
+        <a class="nav-link " href="./plan_route_intel.html">路線情報員</a>
+        <a class="nav-link " href="./plan_fare_planner.html">優惠精算師</a>
+        <a class="nav-link " href="./plan_ui_designer.html">介面設計師</a>
+      </div>
+    </nav>
+
+    <main class="doc-surface">
+      <h1>個人計畫書：架構師</h1>
+<blockquote><strong>你的定位</strong>：你是整個專案的<strong>架構師</strong>，負責定版雙向資料合約、守護主機推論閘道的安全與穩定、管好 GitHub 自動化部署，並把路線情報員、優惠精算師、介面設計師三條平行產線平滑串接成完整網站。</blockquote>
+<hr />
+<h2>一、你的專屬主場與邊界</h2>
+<ul><li><strong>你掌控的目錄</strong>：<code>schema/</code>、<code>.github/</code>、根目錄專案設定（<code>package.json</code>、<code>tsconfig.json</code>、<code>vite.config.ts</code>、專案根目錄 <code>AGENTS.md</code>）、<code>.agents/skills/</code>，以及獨立<strong>主機</strong>端的閘道服務。</li><li><strong>順手幫全隊減壓的認領項</strong>：5 區精選景點由 4 人平分人工校對（等路線情報員從 TDX 產出初稿骨架後，你認領 <strong>1 個本島區域，例如北北基</strong> 補齊公休日與室內雨備標籤即可）。</li></ul>
+<hr />
+<h2>二、你真正要動腦的地方（AI 不能替你決定）</h2>
+<p>AI 很會生設定檔，但以下 4 個判斷必須由你拍板：</p>
+<ol><li><strong>雙向合約的「克制度」</strong>：<code>schema/trip.ts</code> 決定了整個團隊的溝通成本。你要決定哪些欄位是必填核心（例如 <code>origin</code>、<code>lodgingTier</code>、<code>perIdentitySplit</code>），哪些先留成選填（<code>tips?</code>、<code>aiSummary?</code>），防止大家寫到一半一直膨脹欄位、引發大改。</li><li><strong>三層快取邊界切分</strong>：你要跟路線情報員一起劃清楚——哪些資料放 GitHub 靜態 JSON（每日更新）、哪些放 Cloudflare KV（跨節點共用 15 分鐘～3 小時）、哪些留在瀏覽器 <code>localStorage</code>（PWA 離線），才能在 TDX 5 次/分限制下維持流暢。</li><li><strong>主機小模型出錯時的「體面補救」</strong>：就算用了 <code>Zod</code> / Pydantic 強型別檢查，4B 小模型有時還是會漏抓出發日期或把離島拼錯。你要設計好「缺項清單回傳格式」，讓前端高亮度提示旅客補點 1 下，而不是整段放棄重來。</li><li><strong>PR 合併順序與整合節奏</strong>：當三條分支準備合流進 <code>main</code> 時，你要先確保 <code>engine/</code> 與 <code>services/</code> 符合合約，再把 <code>src/</code> 裡的 Mock 替換成真實函式。</li></ol>
+<hr />
+<h2>三、推薦工具與 GitHub Skills 使用指南</h2>
+<div class="table-scroll"><table><thead><tr><th>工具 / Skill</th><th>來源與用法</th><th>為什麼推薦你用</th></tr></thead><tbody><tr><td><strong>專案共用合約 Skill</strong></td><td>已設於 <code>.agents/skills/tw-trip-contract/SKILL.md</code></td><td>只要推上 GitHub，每位夥伴的 AI 開工前都能直接載入同一套目錄邊界與合約守則，不必每次重貼規則。</td></tr><tr><td><strong>安全檢查工具 (<code>skill-security-guard</code>)</strong></td><td>全域已安裝；指令：<br><code>python .../audit_skill.py &lt;目標資料夾&gt;</code></td><td>夥伴想從 GitHub 加裝任何外部 Skill（如 React 或 Cloudflare Skill）前，請先過一次掃描，防範隱藏 Prompt 攻擊。</td></tr><tr><td><strong><code>cloudflare/security-audit-skill</code></strong>（GitHub）</td><td>經安全掃描確認後，用來檢查 FastAPI 閘道與 Cloudflare Worker Proxy</td><td>專門幫你揪出 CORS 設成 <code>*</code>、未攔截超長輸入或把錯誤堆疊洩漏給前端的資安漏洞。</td></tr><tr><td><strong>主機閘道棧：<code>FastAPI</code> + <code>Pydantic</code> + <code>Ollama</code> + <code>cloudflared</code></strong></td><td>主機跑 <code>qwen3.5:4b</code>，用 <code>cloudflared</code> 走 HTTPS 通道給 GitHub Pages 連入</td><td>鎖死 <code>OLLAMA_NUM_PARALLEL=1</code>、<code>OLLAMA_MAX_LOADED_MODELS=1</code>、<code>num_ctx=4096</code>、<code>OLLAMA_KEEP_ALIVE=5m</code>；前端不直接暴露 Ollama <code>11434</code> Port。</td></tr><tr><td><strong><code>Zod</code> ＋ TypeScript (<code>strict: true</code>)</strong></td><td>編譯期＋執行期雙重型別鎖死</td><td>主機吐回 JSON 進瀏覽器時再用 <code>Zod</code> 驗一次，保證不讓錯誤格式弄壞畫面。</td></tr></tbody></table></div>
+<hr />
+<h2>四、你的行動步驟</h2>
+<h3>階段 1：建好舞台與雙向合約（開工第 1 天）</h3>
+<ol><li>初始化 <code>Vite + React + TypeScript + Tailwind CSS + Vitest</code> 專案骨架（預留 <code>vite-plugin-pwa</code> 設定位）。</li><li>定版 <code>schema/trip.ts</code>（完整納入總計畫書的 <code>TripInput</code> 與 <code>TripPlanResult</code>）並寫好 2 組真實感滿分的 <code>schema/mockTripData.ts</code>（建議：「台北出發澎湖 3 天 2 夜混合團（含海象黃燈與雨備）」、「台中出發台南 2 天 1 夜雙鐵＋好行（含改平日省錢提示）」）。</li><li>設定 GitHub <code>main</code> 分支保護，確認三位夥伴都能開自己的 branch 推上來。</li></ol>
+<h3>階段 2：架設主機「精準雙任務」閘道（與團隊平行推進）</h3>
+<p>主機不開放無上限自由聊天，只開兩個高穩定 API 端點，並加上 <strong>佇列上限 3 人（超過秒回 <code>429</code>）</strong>、單一 IP 限流與 <strong>Cloudflare Turnstile</strong>：</p>
+<ol><li><strong><code>POST /api/parse-input</code>（口語轉條件）</strong>：把旅客輸入的一句話（限 500 字內）強制以 <code>format: &quot;json&quot;</code> 解析成 <code>TripInput</code> 欄位；若缺乏必要欄位（如沒寫出發地或天數），回傳已解析部分 ＋ <code>missingFields</code> 清單。</li><li><strong><code>POST /api/summarize</code>（白話導讀）</strong>：只吃優惠精算師引擎已經算好的數字與警告，請模型整理成 150 字以內的台灣口語亮點與省錢摘要（嚴禁模型自己猜車次或票價）。</li></ol>
+<h3>階段 3：協作校對、整合與部署</h3>
+<ol><li>認領並校對 1 區精選景點 JSON（例：北北基），補充公休日與室內備案。</li><li>依序將 <code>engine/</code>、<code>services/</code>、<code>src/</code> 的 PR 合併進 <code>main</code>，實測「把主機閘道關掉」時整個網站是否依然能順暢完成排程與分享。</li><li>以 <code>.github/workflows/deploy.yml</code> 完成 GitHub Pages 自動發布。</li></ol>
+<hr />
+<h2>五、直接貼給架構師 AI 的執行指令</h2>
+<div class="code-card"><div class="code-header"><span class="code-lang">可直接複製給 AI 的執行指令</span><button type="button" class="copy-btn" data-copy-target="code-block-1" aria-label="複製內容"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>一鍵複製</span></button></div><pre><code id="code-block-1">你是協助「架構師」建立專案基石的系統架構 AI。請幫我處理以下任務，並嚴格遵守專案根目錄的 AGENTS.md 與 .agents/skills/tw-trip-contract/SKILL.md：
+
+1. 【初始化專案骨架】
+   - 建立 Vite + React + TypeScript (strict: true) + Tailwind CSS + Vitest 專案骨架，並設定 vite-plugin-pwa 基礎設定。
+   - 建立隔離目錄：schema/、data/、services/、engine/、src/、gateway/。
+
+2. 【定版雙向合約 schema/trip.ts 與 Mock 資料】
+   - 依團隊總計畫書完整實作 schema/trip.ts（涵蓋 OriginRegion, RegionCode, LodgingTier, TripInput, CuratedSpot, DayStop, DayPlan, IdentityCostShare, BudgetBreakdown, ReviewWarning, TripPlanResult）。
+   - 同時建立對應的 Zod Schema 供執行期驗證使用。
+   - 在 schema/mockTripData.ts 撰寫 2 組完整且符合 TripPlanResult 結構的假資料（台北→澎湖 3 天 2 夜混合團含海象雨備、台中→台南 2 天 1 夜含平日省錢提示與分帳明細）。
+
+3. 【主機精準雙任務 FastAPI 閘道 (gateway/main.py)】
+   - 僅呼叫本機 127.0.0.1:11434 的 Ollama (qwen3.5:4b)，不暴露 11434 Port。
+   - 實作併發 Semaphore=1、等待佇列上限 3 筆（超出立刻回傳 HTTP 429 JSON）。
+   - 實作單一 IP 限流、500 字輸入上限，以及僅允許 GitHub Pages 網域的 CORS 設定。
+   - 實作兩個端點：
+     (a) POST /api/parse-input：強制 JSON 輸出，以 Pydantic 驗證欄位並回傳 parsed 與 missingFields。
+     (b) POST /api/summarize：接收引擎算好的確定性數字與警告，輸出 150 字內台灣口語白話導讀（Prompt 明確禁止捏造數字）。
+
+4. 【GitHub Actions 自動化】
+   - 建立 .github/workflows/deploy.yml 支援推送至 main 後自動執行 typecheck、vitest run、build 並部署到 GitHub Pages。</code></pre></div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      var copySvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+
+      function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('data-copy-target');
+          var el = document.getElementById(targetId);
+          if (!el) return;
+          var text = el.textContent || '';
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
+          } else {
+            fallbackCopy(text);
+          }
+          btn.classList.add('is-copied');
+          btn.innerHTML = checkSvg + '<span>已複製</span>';
+          setTimeout(function () {
+            btn.classList.remove('is-copied');
+            btn.innerHTML = copySvg + '<span>一鍵複製</span>';
+          }, 1800);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

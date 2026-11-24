@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>個人計畫書：介面設計師 — 台灣旅遊規劃網頁專案</title>
+  <style>
+    :root {
+      --bg-canvas: #f4f4f0;
+      --bg-surface: #ffffff;
+      --bg-subtle: #fafaf7;
+      --border-subtle: #e2e1db;
+      --border-hover: #cbcaca;
+      --accent-primary: #d97706;
+      --accent-hover: #b45309;
+      --accent-soft: #fffbeb;
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-muted: #78716c;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-shell {
+      min-height: 100dvh;
+      padding: 20px 16px max(48px, env(safe-area-inset-bottom));
+    }
+
+    .top-nav {
+      max-width: 820px;
+      margin: 0 auto 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 8px 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      touch-action: manipulation;
+      transition: border-color 140ms ease-out, background-color 140ms ease-out, transform 80ms ease-out;
+    }
+    .nav-link:hover { border-color: var(--border-hover); background: var(--bg-subtle); }
+    .nav-link:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .nav-link:active { transform: scale(0.97); }
+    .nav-link.is-active {
+      border-color: var(--accent-primary);
+      background: var(--accent-soft);
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .nav-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .doc-surface {
+      max-width: 820px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: clamp(20px, 4vw, 44px);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      margin: 32px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 10px 0;
+      color: var(--text-secondary);
+      max-width: 72ch;
+    }
+
+    strong { color: var(--text-primary); font-weight: 600; }
+
+    a {
+      color: var(--accent-hover);
+      text-underline-offset: 3px;
+      font-weight: 500;
+    }
+    a:hover { color: var(--accent-primary); }
+    a:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; border-radius: 3px; }
+
+    blockquote {
+      margin: 16px 0;
+      padding: 12px 16px;
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent-primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border-subtle);
+      margin: 28px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0;
+      padding-left: 22px;
+      color: var(--text-secondary);
+    }
+    li { margin: 6px 0; }
+    li > ul { margin-top: 4px; }
+
+    code {
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.88em;
+      background: #f5f5f4;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #1c1917;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.925rem;
+      font-variant-numeric: tabular-nums;
+      background: var(--bg-surface);
+    }
+    th, td {
+      padding: 11px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    thead th {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .diagram-wrap {
+      margin: 18px 0;
+      padding: 16px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    .code-card {
+      margin: 16px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      background: #efefe9;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .code-lang {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: var(--accent-primary);
+      color: #ffffff;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      transition: background-color 140ms ease-out, transform 80ms ease-out;
+    }
+    .copy-btn:hover { background: var(--accent-hover); }
+    .copy-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .copy-btn:active { transform: scale(0.97); }
+    .copy-btn.is-copied { background: #15803d; }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #1c1917;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nav-link, .copy-btn { transition: none; }
+      .nav-link:active, .copy-btn:active { transform: none; }
+    }
+
+    @media print {
+      body { background: #ffffff; }
+      .top-nav, .copy-btn { display: none !important; }
+      .doc-surface { border: 0; padding: 0; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav class="top-nav" aria-label="計畫書快速切換">
+      <div class="nav-group">
+        <a class="nav-link " href="./master_project_plan.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>團隊總計畫書</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <a class="nav-link " href="./plan_architect.html">架構師</a>
+        <a class="nav-link " href="./plan_route_intel.html">路線情報員</a>
+        <a class="nav-link " href="./plan_fare_planner.html">優惠精算師</a>
+        <a class="nav-link is-active" href="./plan_ui_designer.html">介面設計師</a>
+      </div>
+    </nav>
+
+    <main class="doc-surface">
+      <h1>個人計畫書：介面設計師</h1>
+<blockquote><strong>你的定位</strong>：你是整個專案的<strong>介面設計師</strong>。旅客打開網頁的第一眼會不會想繼續點、同團算完分帳看不看得懂、在太陽很大或訊號很差的海邊手機好不好點——決定我們能不能真正贏過「去趣」和「Funliday」的臨門一腳，就在你手上。</blockquote>
+<hr />
+<h2>一、你的專屬主場與創作自由</h2>
+<ul><li><strong>你掌控的目錄</strong>：<code>src/</code></li><li><strong>完全不用等別人就能動工</strong>：專案一建好，你就直接拿 <code>schema/mockTripData.ts</code> 裡完整的兩組假資料開發所有畫面與互動；等路線情報員跟優惠精算師合併後，只要把呼叫函式換上真實引擎就能立刻連通。</li><li><strong>順手幫全隊減壓的認領項</strong>：等路線情報員從 TDX 產出 5 區初稿後，你認領 <strong>1 區（例如台南）</strong> 校對景點真實公休與備註。</li></ul>
+<hr />
+<h2>二、你真正要動腦的地方（AI 不能替你決定）</h2>
+<ol><li><strong>高資訊密度的「克制感」</strong>（我們最大的勝出點）：</li></ol>
+<p>升級後結果頁同時要顯示「主機白話導讀」、「全團省多少＋改平日建議」、「每人分帳 AA 明細」、「國土測繪中心互動地圖」、「每日時間軸＋按鈕微調」、「外帶匯出」。如果全部攤平塞在一頁，就會重蹈去趣介面雜亂的覆轍。你要自己設計<strong>資訊分層</strong>：第一眼只露「總價／省下金額／今日地圖與骨架」，分帳明細、官網查驗連結與細部花費收進乾淨的展開抽屜或分頁。</p>
+<ol><li><strong>「點兩下就能微調」的手機順手度</strong>：</li></ol>
+<p>我們刻意放棄容易跟手機上下滑動打架的手指跨天拖拉，改用 <strong>44px 按鈕微調</strong>（換順路點／上移／下移／刪掉／切雨備）。你要設計出點完按鈕後視覺焦點不跳走、金額變化有清楚微回饋的手感。</p>
+<ol><li><strong>手機、iPad 與桌機的雙欄比例</strong>：</li></ol>
+<p>在 iPad 橫向（<code>&gt;= 1024px</code>）左邊時間軸＋右邊國土測繪中心地圖並列極好用；但在手機或 iPad 直向，地圖如果固定佔半個螢幕會完全壓縮閱讀區，建議改為「頂部切換按鈕（列表 / 地圖）或可收合小地圖」。</p>
+<hr />
+<h2>三、目前蒐集好供你運用的設計工具與 GitHub Skills</h2>
+<blockquote><strong>安裝外部 Skill 前的小提醒</strong>：從 GitHub 抓新的 Skill 回自己電腦前，請先交給架構師或本機安全檢查腳本掃描過一次再啟用。</blockquote>
+<div class="table-scroll"><table><thead><tr><th>工具 / Skill</th><th>來源與用途</th><th>關鍵用法與標準</th></tr></thead><tbody><tr><td><strong>專案憲法 <code>AGENTS.md</code> ＋ 合約 Skill</strong></td><td>根目錄 <code>AGENTS.md</code> ＋ <code>.agents/skills/tw-trip-contract/SKILL.md</code></td><td>• <strong>Warm Tactile</strong> 色票：<code>#f4f4f0</code> 暖紙白底、<code>#ffffff</code> 純白面、<code>#e2e1db</code> 1px 細線、<code>#d97706</code> 暖赭主鈕、<code>#1c1917</code> 深炭字<br>• 禁暗底紫藍漸層、禁 Box-in-Box 巢狀卡片、禁原始 Emoji 改用 <code>lucide-react</code> 1.5px SVG、金額時刻必加 <code>tabular-nums</code><br>• 最小點擊熱區 <code>44×44px</code>、間距 <code>&gt;= 8px</code>、禁依賴 <code>:hover</code>、<code>100dvh</code> ＋ <code>env(safe-area-inset-bottom)</code></td></tr><tr><td><strong><code>vercel-labs/agent-skills</code></strong>（GitHub）</td><td>夥伴電腦安裝：<br><code>npx skills add vercel-labs/agent-skills</code></td><td>載入 <code>vercel-react-best-practices</code> 與 <code>web-design-guidelines</code>，檢查 React 重繪效能、地圖元件動態載入（Lazy Load）與無障礙標籤。</td></tr><tr><td><strong><code>anthropics/skills</code></strong>（GitHub）</td><td>夥伴電腦安裝：<br><code>npx skills add anthropics/skills --skill frontend-design</code></td><td>搭配台灣口語規則（不出現翻譯腔與互聯網黑話），讓畫面有真實設計感。</td></tr><tr><td><strong>零元台灣地圖：<code>Leaflet</code> + <code>react-leaflet</code> + 國土測繪中心 WMTS</strong></td><td>圖磚網址：<code>https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}</code></td><td>完全免費免申請 Key！在地圖上標出每日數字點位（1、2、3…）與連接折線，點標記能跳到對應行程卡片。</td></tr><tr><td><strong>離線與外帶：<code>vite-plugin-pwa</code></strong></td><td>自動快取前端殼層，搭配 <code>localStorage</code> 存最近排好的幾份行程</td><td>離島海邊斷網時也能照常打開看行程文字、票價與緊湊清單（地圖圖磚可溫和提示離線不顯示）。</td></tr><tr><td><strong>免費分享：<code>Firebase Firestore Spark</code></strong></td><td>免綁信用卡，存「免登入唯讀分享短連結」</td><td>旅客點「分享給旅伴」寫入 <code>&lt; 50KB</code> JSON（配 Anonymous Auth / App Check）；旅伴打開網址免註冊就能看，按一下「複製到我的裝置微調」就存進自己手機。</td></tr><tr><td><strong><code>Playwright</code> ＋ <code>Vitest / Testing Library</code></strong></td><td>元件單元測試 ＋ 實測 <code>375px</code> 手機、<code>768px</code> / <code>1024px</code> iPad 畫面</td><td>用實機模擬確認按鈕不會太小、長表格不撐爆橫向捲軸。</td></tr></tbody></table></div>
+<hr />
+<h2>四、你的工作節奏與自我檢查清單</h2>
+<ol><li><strong>前置準備</strong>：從 <code>main</code> 開出個人分支 <code>feat/ui-warm-tactile</code>，建好 <code>src/styles/tokens.css</code> 與雙欄／手機自適應外殼（App Shell）。</li><li><strong>打造 3 步驟精簡調查表（<code>1-to-3</code> 焦點原則）</strong>：<ul><li>頂部可選「一句話讓主機幫我填」：接到主機回傳的 <code>missingFields</code> 時只高亮提醒缺的那 1–2 題；若收到降級訊號（離線或排隊滿），用溫和口語提示「目前直接點下面表單也很快」，不跳錯誤警告視窗。</li><li><strong>Step 1</strong>：出發地（<code>origin</code>）＋ 目的地（本島／離島）＋ 日期天數（自動提示早鳥窗）＋ 預算與住宿等級／間數。</li><li><strong>Step 2</strong>：同團混搭身分加減計數器（<code>+ / -</code> 至少 <code>44px</code>）＋ 已持有卡片（TPASS / 敬老愛心卡 / 離島住民）。</li><li><strong>Step 3</strong>：交通方式複選 ＋ 行程節奏（慢活／剛剛好／跑滿／幫我決定）。</li></ul></li><li><strong>打造結果與互動微調頁</strong>：<ul><li><strong>摘要與省錢區</strong>：主機 150 字白話導讀（有才顯示）、全團原價 vs. 折後價、「改平日可省更多」提示條、以及<strong>可展開的「各身分每人分帳 AA 表」</strong>。</li><li><strong>雙模式地圖 ＋ 時間軸</strong>：國土測繪中心 WMTS＋Leaflet 每日編號路線圖（桌機／平板橫向並列，手機一鍵切換列表/地圖）；每個景點旁附 <strong>44px 按鈕微調列</strong>（換順路備選／上移／下移／刪除），海象黃紅燈時秀出「一鍵切換雨備」開關。</li><li><strong>免登入外帶工具列</strong>：一鍵開每日 Google Maps 導航路線、下載 <code>.ics</code> 行事曆檔、列印專用樣式、Firestore 唯讀分享短連結（含「複製為我的副本來改」模式）。</li></ul></li><li><strong>自我確認再發 PR</strong>：跑完元件互動測試、用瀏覽器實測手機 375px 與 iPad 768px/1024px 佈局、執行 <code>npm run build</code> 零錯誤後發 Pull Request。</li></ol>
+<hr />
+<h2>五、直接貼給介面設計師 AI 的執行指令</h2>
+<div class="code-card"><div class="code-header"><span class="code-lang">可直接複製給 AI 的執行指令</span><button type="button" class="copy-btn" data-copy-target="code-block-1" aria-label="複製內容"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>一鍵複製</span></button></div><pre><code id="code-block-1">你是我的協作 AI，負責「介面設計師（前端架構與設計工程）」開發工作。開工前必須先閱讀並嚴格遵守專案根目錄的 AGENTS.md 與 .agents/skills/tw-trip-contract/SKILL.md（可同時參考 vercel-react-best-practices 與 web-design-guidelines 原則）。請協助我完成以下實作：
+
+1. 【目錄隔離與 Mock 先行】
+   - 只在 src/ 目錄內建立與修改檔案，絕對不要修改 schema/、services/ 或 engine/。
+   - 開發初期直接 import schema/trip.ts 與 schema/mockTripData.ts 的完整 TripPlanResult 假資料實作全部互動（預留呼叫 engine/mutations 的 callback 介面）。
+
+2. 【Warm Tactile 設計系統與反 AI Slop 鐵律】
+   - 建立 src/styles/tokens.css：--bg-canvas: #f4f4f0、--bg-surface: #ffffff、--border-subtle: #e2e1db、--accent-primary: #d97706、--text-primary: #1c1917、--text-secondary: #57534e。
+   - 嚴禁暗底紫藍漸層、嚴禁 Box-in-Box 巢狀圓角卡片（改用單層平面＋留白＋1px 細線分隔）、嚴禁使用任何原始 Emoji 當圖示（一律使用 lucide-react，strokeWidth={1.5}）。
+   - 所有金額、票價、車次時刻、分帳與天數一律啟用 `font-variant-numeric: tabular-nums`。
+   - 所有互動元件具備 8 態回饋（含 :focus-visible 外框與 active:scale-[0.97]，過渡 &lt; 200ms）。
+
+3. 【平板與手機觸控規格】
+   - 所有按鈕、身分加減計數器與微調控制最小點擊熱區 44px × 44px，相鄰間距 &gt;= 8px，不依賴 :hover 顯示關鍵操作。
+   - 版面高度採 min-height: 100dvh 並於底部保留 env(safe-area-inset-bottom)。
+   - 平板橫向 (&gt;= 1024px) 採左時間軸＋右地圖雙欄；手機與直向平板提供清楚的「列表 / 地圖」切換，避免地圖擠壓表單與文字。
+
+4. 【完整頁面與台灣口語文案】
+   - 3 步驟精簡調查表：含出發地、目的地（本島/離島）、住宿等級與間數、同團混搭身分計數器、交通複選與節奏；頂部選配「一句話讓主機幫我填」（能處理 missingFields 高亮補填，並在降級時溫和引導改用表單）。
+   - 結果儀表板：
+     (a) 選配的 150 字主機白話導讀（僅在 aiSummary 存在時顯示）。
+     (b) 預算總覽卡：原價 vs. 折後省下金額、「改平日省更多」提示條、以及可展開的「各身分每人 AA 分帳明細表」。
+     (c) 零元台灣地圖（使用 react-leaflet + 內政部國土測繪中心 WMTS EMAP 圖磚，標記每日景點編號與路線折線，需採動態載入避免阻塞首屏）。
+     (d) 時間軸與 44px 按鈕微調列：支援「換順路點 / 上移 / 下移 / 刪除」與海象黃紅燈時「一鍵切雨備」，不做易誤觸的手指跨天拖拉。
+     (e) 外帶功能列：每日 Google Maps 多點路線按鈕、下載 .ics 行事曆按鈕、@media print 潔淨列印樣式、PWA 離線儲存（localStorage）與 Firestore 免登入唯讀分享（含旅伴一鍵複製副本微調）。
+   - 全面檢查文案，確保自然台灣日常口語，完全不含翻譯腔與網路黑話。
+
+5. 【自我檢查測試】
+   - 使用 Vitest + Testing Library 測試：加減同團身分人數與修改出發地更新狀態、降級訊號下仍可完整送出、單點替換與切雨備按鈕事件正確觸發、AA 分帳抽屜可正常展開。執行 `npm test` 與 `npm run build` 確保 0 錯誤。</code></pre></div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      var copySvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+
+      function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('data-copy-target');
+          var el = document.getElementById(targetId);
+          if (!el) return;
+          var text = el.textContent || '';
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
+          } else {
+            fallbackCopy(text);
+          }
+          btn.classList.add('is-copied');
+          btn.innerHTML = checkSvg + '<span>已複製</span>';
+          setTimeout(function () {
+            btn.classList.remove('is-copied');
+            btn.innerHTML = copySvg + '<span>一鍵複製</span>';
+          }, 1800);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

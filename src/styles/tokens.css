@@ -1,0 +1,17 @@
+:root {
+  --bg-canvas: #f4f4f0;
+  --bg-surface: #ffffff;
+  --bg-muted: #ebe9e1;
+  --border-subtle: #e2e1db;
+  --accent-primary: #d97706;
+  --accent-primary-hover: #b45309;
+  --accent-soft: #fef3c7;
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --status-amber-bg: #fffbeb;
+  --status-amber-text: #92400e;
+  --status-info-bg: #f5f5f4;
+  --status-info-text: #44403c;
+  --radius-card: 12px;
+  --radius-control: 10px;
+}
