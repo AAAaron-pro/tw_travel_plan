@@ -1,6 +1,10 @@
-# 保護共用合約、CI/CD 與主機閘道目錄
+# 保護共用合約、CI/CD、主機閘道與根目錄設定／依賴鎖定檔
 # 團隊夥伴加入後，可視需要再補入各自負責路徑的 GitHub 帳號
 
-/schema/    @AAAaron-pro
-/.github/   @AAAaron-pro
-/gateway/   @AAAaron-pro
+/schema/            @AAAaron-pro
+/.github/           @AAAaron-pro
+/gateway/           @AAAaron-pro
+/package.json       @AAAaron-pro
+/package-lock.json  @AAAaron-pro
+/AGENTS.md          @AAAaron-pro
+/CLAUDE.md          @AAAaron-pro

@@ -1,135 +1,69 @@
 ---
 name: backup
-description: "把目前所有未儲存的旅行檔案變更一次存到雲端（commit + push + merge to main）。**只在使用者明確說『儲存』『保存』『存到雲端』『commit』『存起來』『備份』『上傳』時觸發**，或是使用者看到「尚未儲存」提示後主動要求儲存時觸發。**不要在 Claude 自己寫完檔後主動呼叫**（那樣會煩到使用者）。給外行人用，全程不需要懂 git。"
+description: "把目前的變更推送到團隊功能分支並準備 Pull Request（禁止直推 main）。當使用者明確說『儲存』『保存』『存到雲端』『commit』『存起來』『備份』『上傳』『推上去』『發 PR』時觸發。不要在 AI 自己剛改完檔就主動執行，需先等使用者同意。"
 user-invocable: true
 ---
 
-# /backup — 把旅行變更存到雲端
+# /backup — 功能分支推送與 PR 準備流程
 
-使用與使用者相同的語言回覆（預設繁體中文）。
+使用台灣繁體中文與白話說明回覆。
 
-對 trip 規劃使用者來說，雲端 sandbox 是短暫的，session 結束未存的變更就消失。這個 skill 把**整個倉庫**（含根目錄檔案、所有行程資料夾）的變更一次存到雲端 GitHub repo。
+本專案的 `main` 分支已啟用保護規則（`protect-main`），**禁止**任何非管理員分支直接 `merge` 或 `push` 到 `main`，也**嚴禁** `--force` 強制推送。所有開發成果一律推送到 `feat/<角色>-<主題>` 分支並透過 Pull Request 合併。
 
-**多行程也是一次存**：這個倉庫可能有多個行程資料夾（`1-布達佩斯-2026-04-24/`、`2-日本-2026-10-03/`…）+ 根目錄檔案（`current-trip`、`traveler-profile.md` 等）。`/backup` 用 `git add -A` 把**全部**一次打包存起來，不分行程。使用者不需要選「要存哪一個行程」。
+## 強制執行步驟
 
-## 措辭規則（重要）
+### 1. 檢查目前所在分支（禁止在 `main` 上直接提交）
 
-**只用這些詞**：儲存、雲端、變更、檔案
-**禁用**：commit、push、merge、branch、staging、stash、HEAD、origin、main、master
+```bash
+git branch --show-current
+```
 
-99% 使用者不是工程師。看到 git 術語會立刻迷失。
+* 若輸出為 `main`：先看 `git status --porcelain` 改動了哪個資料夾，自動切出對應的角色功能分支再繼續：
+  * 改 `services/` 或 `data/` $\rightarrow$ `git checkout -b feat/route-intel-<簡短主題>`
+  * 改 `engine/` $\rightarrow$ `git checkout -b feat/fare-engine-<簡短主題>`
+  * 改 `src/` $\rightarrow$ `git checkout -b feat/ui-<簡短主題>`
+  * 改 `schema/`、`.github/`、`gateway/` $\rightarrow$ `git checkout -b feat/arch-<簡短主題>`
+* 若已經在 `feat/...` 分支上：直接沿用該分支。
 
-## 流程
-
-### 1. 檢查有沒有變更
+### 2. 檢查目錄邊界與鎖定檔（避免合併衝突）
 
 ```bash
 git status --porcelain
 ```
 
-**沒輸出（無變更）** → 直接告訴使用者「目前沒有需要儲存的變更 ✓」，結束。
+* 若無任何變更：直接回覆「目前沒有需要推送的變更」，結束流程。
+* **邊界防呆檢查**：若非架構師分支卻改動到 `package.json`、`package-lock.json`、`schema/`、`.github/`、`gateway/` 或根目錄規範檔，**必須先停下來提醒使用者**，確認還原越界檔案或請架構師統一處理，禁止直接硬推。
 
-**有輸出** → 進入步驟 2。
+### 3. 推送前必跑三項檢查
 
-### 2. 列出變更給使用者看 + 確認
+在提交與推送之前，必須先在本機跑完以下三道檢查且全部通過（任一失敗需先修到 0 錯誤）：
 
-用 `git status --porcelain` 的輸出整理成簡短中文描述，例如：
-
-> 你有以下變更還沒儲存：
-> - 行程表
-> - 記帳檔（加 3 筆花費）
-> - 研究報告（attractions、food）
-
-接著用 `AskUserQuestion` 問：
-
-- 問題：「確定全部存到雲端嗎？」
-- 選項 1：「好，存」（Recommended）
-- 選項 2：「先不要，我再看一下」
-
-### 3. 寫 commit message + 推上去 + 整理到主線
-
-使用者選「好」後：
-
-1. 看 `git diff --cached` 與 `git diff`（含未 staged 的）內容，**自己寫一段簡短中文 commit message** 描述這次主要變動。例如：
-   - 「加入記帳：午餐 25 歐元、地鐵票 14 歐元」
-   - 「更新第 3 天行程：博物館改下午」
-   - 「研究報告：景點與美食」
-   - 變動雜時用「更新旅行檔案」當保底
-
-2. 執行（**全部依序**，不要跳步驟）。**重要**：必須拆成多個獨立的 bash 呼叫，**不要用 `&&` 把全部串成一行**，否則一個失敗就看不出哪步出錯，而且最後的 cleanup 失敗會把整個任務標記成失敗。
-
-   **Step A — 存當前變更**：
-   ```bash
-   git add -A && git commit -m "<你寫的 commit message>"
-   ```
-
-   **Step B — 偵測 branch 並決定路線**：
-   ```bash
-   git rev-parse --abbrev-ref HEAD
-   ```
-
-   **如果輸出是 `main` 或 `master`**：直接推上去
-   ```bash
-   git push origin HEAD
-   ```
-   完成，跳到下面「成功回報」。
-
-   **否則（在 feature branch，記下名字 `<CUR>`）**：以下每一步**獨立呼叫**：
-
-   B1. 推 feature branch（讓雲端先有備份）：
-   ```bash
-   git push origin <CUR>
-   ```
-
-   B2. 切到主線：
-   ```bash
-   git checkout main 2>/dev/null || git checkout master
-   ```
-
-   B3. 拉最新主線：
-   ```bash
-   git pull origin HEAD
-   ```
-
-   B4. **把 feature 合併進主線**（這是關鍵步驟，失敗要中止並回報）：
-   ```bash
-   git merge --no-ff <CUR> -m "整合 <CUR> 的變更"
-   ```
-
-   B5. **推主線**（這也是關鍵步驟，失敗要中止並回報）：
-   ```bash
-   git push origin HEAD
-   ```
-
-   ⬆️ **到 B5 為止，使用者資料已經安全在雲端 main 上**。下面 B6 / B7 只是清理，**失敗也不要回報失敗、不要顯示錯誤訊息給使用者**，靜默跳過即可。
-
-   B6. 刪本機 feature branch（best-effort）：
-   ```bash
-   git branch -d <CUR> 2>/dev/null || true
-   ```
-
-   B7. 刪遠端 feature branch（best-effort，sandbox 的 git proxy 常回 403，**不算錯**）：
-   ```bash
-   git push origin --delete <CUR> 2>/dev/null || true
-   ```
-
-3. **失敗判斷規則**：
-   - **Step A / B4 / B5 任一失敗** → 告訴使用者「儲存遇到問題，{簡短說明，避免術語}」。**不要暴露 git 指令、branch 名稱**。
-   - **B1 / B6 / B7 失敗** → 靜默忽略，使用者不需要知道。資料已經在 main 上了。
-
-4. 最終結果：使用者的工作目錄停在 `main`，所有變更都在 main 上、雲端也是。GitHub 上可能殘留孤兒 feature branch（B7 失敗時），這不影響使用者，**不要主動提**。
-
-### 4. 成功回報
-
-```
-✓ 已儲存到雲端
-
-剛剛的變更全部存好了，現在關掉視窗也不會不見。
+```bash
+npm run typecheck
+npx vitest run
+npm run build
 ```
 
-## 不要做的事
+### 4. 請使用者確認摘要後再提交並推送功能分支
 
-- 不要分多個 commit。一次儲存 = 一次 commit。
-- 不要解釋 git 流程給使用者。
-- 不要問使用者「commit message 要寫什麼」— 自己決定。
-- 不要在使用者沒選「好」前就執行 git add / commit / push。
+先用白話列出這次修改的檔案與功能摘要，獲得使用者同意後再執行：
+
+```bash
+git add -A
+git commit -m "<依變更撰寫之簡短說明>"
+git push -u origin HEAD
+```
+
+* **絕對禁止**在本步驟執行 `git checkout main`、`git merge` 或 `git push origin main`。
+
+### 5. 建立或引導開啟 Pull Request
+
+檢查是否已安裝且登入 GitHub CLI：
+
+```bash
+gh auth status
+```
+
+* **若 `gh` 已登入**：依據 `.github/pull_request_template.md` 格式自動填入變更摘要與檢查勾選，執行 `gh pr create --base main ...` 建立 PR，並將 PR 網址回報給使用者。
+* **若無 `gh` CLI 或尚未登入**：直接把填妥的 PR 標題、模板內文，以及以下一鍵開啟 PR 網址提供給使用者點擊送出：
+  `https://github.com/AAAaron-pro/tw_travel_plan/compare/main...<當前分支名>?expand=1`

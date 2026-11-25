@@ -19,6 +19,7 @@ description: 台灣國內與離島旅遊規劃網頁專案的團隊共用合約�
 | **介面設計師** | `src/`（及個人認領的 `data/curated/` 區段） | `schema/`、`services/`、`engine/` |
 
 - 若開發過程發現 `schema/trip.ts` 缺少欄位，必須**立即停止改動共用檔**，輸出 `SCHEMA_CHANGE_REQUEST`（含欄位名稱、型別與用途說明）供架構師與全隊對齊後統一更新。
+- **依賴鎖定紀律**：根目錄 `package.json` 與 `package-lock.json` 已預裝 `leaflet`、`react-leaflet`、`@types/leaflet`、`zod`、`lucide-react`、`vite-plugin-pwa`。非架構師分支禁止執行會改動根目錄依賴檔的 `npm install <新套件>`；若確有新套件需求，請先告知架構師統一安裝。
 
 ## 2. 雙向型別合約（`schema/trip.ts`）
 
@@ -48,11 +49,11 @@ description: 台灣國內與離島旅遊規劃網頁專案的團隊共用合約�
 
 ## 6. 交付與合併前自我檢查
 
-推送功能分支（`feat/<角色>-<主題>`）與發起 PR 前，必須在本機執行並確認全數通過：
+倉庫的 `main` 分支已啟用保護規則：**嚴禁直接 commit、merge 或 push 到 `main`**，也**嚴禁使用 `--force`**。一律推送到 `feat/<角色>-<主題>` 分支並發起 Pull Request（若使用 `/backup` 技能也會自動改走分支＋PR 流程）。推送前必須在本機執行並確認全數通過：
 
 ```bash
 npm run typecheck      # tsc --noEmit（嚴格型別 0 錯誤）
 npx vitest run         # 單元與邊界測試 0 failed
 npm run build          # Vite 靜態編譯 0 錯誤
-git diff --stat        # 確認沒有任何檔案超出所屬目錄邊界
+git diff --stat        # 確認沒有任何檔案超出所屬目錄邊界（且未動到 package.json / package-lock.json）
 ```
