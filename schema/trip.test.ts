@@ -164,7 +164,7 @@ describe('schema/trip.ts bidirectional contract & Zod validation', () => {
         (acc, item) => acc + item.count * item.totalPerPersonTwd,
         0
       );
-      expect(splitSum).toBe(budget.discountedTotalTwd);
+      expect(splitSum + budget.roundingRemainderTwd).toBe(budget.discountedTotalTwd);
 
       // Ensure no spot is scheduled on its closedDays
       for (const day of plan.days) {
@@ -191,6 +191,47 @@ describe('schema/trip.ts bidirectional contract & Zod validation', () => {
     expect(tainanModes).toContain('taiwan_tourist_shuttle');
     expect(mockTainanTripPlan.budget.weekdayShiftSavingHint).toBeDefined();
     expect(mockTainanTripPlan.budget.weekdayShiftSavingHint?.estimatedSaveTwd).toBeGreaterThan(0);
+  });
+
+  it('keeps money in whole TWD and reconciles uneven AA splits with roundingRemainderTwd', () => {
+    // 3 adults sharing NT$ 1,000
+    const evenSplit = {
+      originalTotalTwd: 1000,
+      discountedTotalTwd: 1000,
+      savedTotalTwd: 0,
+      transportTwd: 1000,
+      lodgingTwd: 0,
+      activityAndFoodTwd: 0,
+      isOverBudget: false,
+      perIdentitySplit: [
+        {
+          identity: 'adult',
+          count: 3,
+          transportPerPersonTwd: 333,
+          lodgingPerPersonTwd: 0,
+          activityPerPersonTwd: 0,
+          totalPerPersonTwd: 333,
+          appliedDiscounts: [],
+        },
+      ],
+      roundingRemainderTwd: 1,
+    };
+    expect(BudgetBreakdownSchema.safeParse(evenSplit).success).toBe(true);
+    expect(BudgetBreakdownSchema.safeParse({ ...evenSplit, roundingRemainderTwd: 0 }).success).toBe(
+      false
+    );
+
+    const decimalShare = { ...evenSplit.perIdentitySplit[0], totalPerPersonTwd: 333.33 };
+    expect(
+      BudgetBreakdownSchema.safeParse({
+        ...evenSplit,
+        perIdentitySplit: [decimalShare],
+        roundingRemainderTwd: 0.01,
+      }).success
+    ).toBe(false);
+    expect(
+      TripInputSchema.safeParse({ ...mockPenghuTripPlan.input, budgetPerPersonTwd: 5000.5 }).success
+    ).toBe(false);
   });
 
   it('rejects impossible calendar dates, invalid ISO timestamps, and non-HTTP(S) URLs', () => {

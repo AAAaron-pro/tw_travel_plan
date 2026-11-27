@@ -47,6 +47,7 @@ def make_summary_payload() -> dict:
                     "appliedDiscounts": ["敬老 5 折"],
                 },
             ],
+            "roundingRemainderTwd": 0,
         },
         "reviewWarnings": [
             {
@@ -358,15 +359,8 @@ async def test_parse_input_normalizes_empty_senior_card_county_to_none(raw_count
     assert resp.json()["parsed"]["passes"]["seniorCardCounty"] is None
 
 
-@pytest.mark.asyncio
-async def test_parse_input_rejects_impossible_calendar_date_with_502():
+async def post_parse_input(ollama_content: object) -> httpx.Response:
     async def handler(_request: httpx.Request) -> httpx.Response:
-        ollama_content = {
-            "origin": "taipei_keelung",
-            "destination": "penghu",
-            "startDate": "2026-02-30",
-            "days": 3,
-        }
         return httpx.Response(
             200,
             json={"message": {"role": "assistant", "content": json.dumps(ollama_content)}},
@@ -379,11 +373,47 @@ async def test_parse_input_rejects_impossible_calendar_date_with_502():
         transport=httpx.ASGITransport(app=app),
         base_url="http://testserver",
     ) as client:
-        resp = await client.post("/api/parse-input", json={"text": "二月三十日去澎湖"})
+        resp = await client.post("/api/parse-input", json={"text": "台北兩個大人去玩三天"})
 
     await mock_client.aclose()
+    return resp
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("bad_fields", "dropped"),
+    [
+        ({"startDate": "2026-02-30"}, ["startDate"]),
+        ({"destination": "kenting", "budgetPerPersonTwd": 5000.5}, ["destination", "budgetPerPersonTwd"]),
+    ],
+)
+async def test_parse_input_drops_invalid_fields_into_missing_fields(bad_fields: dict, dropped: list[str]):
+    resp = await post_parse_input(
+        {"origin": "taipei_keelung", "destination": "penghu", "days": 3, **bad_fields}
+    )
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["parsed"]["origin"] == "taipei_keelung"
+    assert data["parsed"]["days"] == 3
+    for name in dropped:
+        assert data["parsed"][name] is None
+        assert name in data["missingFields"]
+
+
+@pytest.mark.asyncio
+async def test_parse_input_non_object_json_returns_502():
+    resp = await post_parse_input(["taipei_keelung", "penghu"])
 
     assert resp.status_code == 502
+
+
+def test_trust_proxy_headers_defaults_to_true(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("TRUST_PROXY_HEADERS", raising=False)
+    assert GatewaySettings().trust_proxy_headers is True
+
+    monkeypatch.setenv("TRUST_PROXY_HEADERS", "false")
+    assert GatewaySettings().trust_proxy_headers is False
 
 
 @pytest.mark.asyncio
