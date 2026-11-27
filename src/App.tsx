@@ -31,7 +31,8 @@ const IDENTITY_LABELS: Record<IdentityKey, string> = {
   senior65Plus: '65 歲以上長輩',
   child3To12: '3–12 歲孩童',
   infantUnder3: '未滿 3 歲幼兒',
-  disabledWithCompanion: '愛心／陪伴票',
+  disabled: '身心障礙者（愛心票）',
+  disabledCompanion: '必要陪伴者（愛心票）',
 };
 
 export function App() {

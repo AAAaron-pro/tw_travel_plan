@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
   BudgetBreakdownSchema,
+  countTravelers,
   CuratedSpotSchema,
   DayPlanSchema,
   DayStopSchema,
@@ -26,6 +27,17 @@ import {
   mockPenghuTripPlan,
   mockTainanTripPlan,
 } from './mockTripData';
+
+const emptyGroup = {
+  adult: 0,
+  collegeStudent: 0,
+  senior65Plus: 0,
+  child3To12: 0,
+  infantUnder3: 0,
+  disabled: 0,
+  disabledCompanion: 0,
+  offshoreResidentCount: 0,
+};
 
 // Compile-time bidirectionality checks: Zod inferred types must remain mutually assignable with TS types
 type AssertAssignable<To, From extends To> = [To, From] | boolean;
@@ -72,23 +84,13 @@ describe('schema/trip.ts bidirectional contract & Zod validation', () => {
     expect(TripInputSchema.safeParse({ ...base, days: '3' }).success).toBe(false);
 
     // Zero travelers in group
-    expect(
-      IdentityCountsSchema.safeParse({
-        adult: 0,
-        collegeStudent: 0,
-        senior65Plus: 0,
-        child3To12: 0,
-        infantUnder3: 0,
-        disabledWithCompanion: 0,
-        offshoreResident: false,
-      }).success
-    ).toBe(false);
+    expect(IdentityCountsSchema.safeParse({ ...emptyGroup }).success).toBe(false);
 
-    // Missing identity key & wrong offshoreResident type
+    // Missing identity key & wrong offshoreResidentCount type
     expect(
       IdentityCountsSchema.safeParse({
         adult: 2,
-        offshoreResident: 'no',
+        offshoreResidentCount: 'no',
       }).success
     ).toBe(false);
 
@@ -191,6 +193,24 @@ describe('schema/trip.ts bidirectional contract & Zod validation', () => {
     expect(tainanModes).toContain('taiwan_tourist_shuttle');
     expect(mockTainanTripPlan.budget.weekdayShiftSavingHint).toBeDefined();
     expect(mockTainanTripPlan.budget.weekdayShiftSavingHint?.estimatedSaveTwd).toBeGreaterThan(0);
+  });
+
+  it('counts disabled travelers, companions and offshore residents as head counts', () => {
+    // 1 wheelchair user + 1 companion = 2 travelers; a Penghu resident hosting 3 Taipei friends
+    const group = { ...emptyGroup, adult: 3, disabled: 1, disabledCompanion: 1, offshoreResidentCount: 1 };
+    expect(IdentityCountsSchema.safeParse(group).success).toBe(true);
+    expect(countTravelers(group)).toBe(5);
+
+    // Companion without a disabled traveler, or 2 companions for 1 disabled traveler
+    expect(IdentityCountsSchema.safeParse({ ...group, disabled: 0 }).success).toBe(false);
+    expect(IdentityCountsSchema.safeParse({ ...group, disabledCompanion: 2 }).success).toBe(false);
+
+    // More offshore residents than travelers
+    expect(IdentityCountsSchema.safeParse({ ...group, offshoreResidentCount: 6 }).success).toBe(false);
+
+    // Children or infants alone cannot travel
+    expect(IdentityCountsSchema.safeParse({ ...emptyGroup, infantUnder3: 1 }).success).toBe(false);
+    expect(IdentityCountsSchema.safeParse({ ...emptyGroup, child3To12: 2 }).success).toBe(false);
   });
 
   it('keeps money in whole TWD and reconciles uneven AA splits with roundingRemainderTwd', () => {

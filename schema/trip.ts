@@ -36,10 +36,12 @@ export const IdentityKeySchema = z.enum([
   'senior65Plus',
   'child3To12',
   'infantUnder3',
-  'disabledWithCompanion',
+  'disabled',
+  'disabledCompanion',
 ]);
 export type IdentityKey = z.infer<typeof IdentityKeySchema>;
 
+// 每個欄位都是「人頭數」：身障者與陪伴者分開算，離島居民可以只有部分團員
 export const IdentityCountsSchema = z
   .object({
     adult: z.number().int().min(0),
@@ -47,23 +49,29 @@ export const IdentityCountsSchema = z
     senior65Plus: z.number().int().min(0),
     child3To12: z.number().int().min(0),
     infantUnder3: z.number().int().min(0),
-    disabledWithCompanion: z.number().int().min(0),
-    offshoreResident: z.boolean(),
+    disabled: z.number().int().min(0),
+    disabledCompanion: z.number().int().min(0),
+    offshoreResidentCount: z.number().int().min(0),
   })
-  .refine(
-    (g) =>
-      g.adult +
-        g.collegeStudent +
-        g.senior65Plus +
-        g.child3To12 +
-        g.infantUnder3 +
-        g.disabledWithCompanion >=
-      1,
-    { message: '同行人數至少需為 1 位旅客' }
-  );
+  .refine((g) => g.adult + g.collegeStudent + g.senior65Plus + g.disabled >= 1, {
+    message: '至少要有 1 位成人、大專生、長輩或身障旅客，不能只有孩童',
+    path: ['adult'],
+  })
+  .refine((g) => g.disabledCompanion <= g.disabled, {
+    message: '每位身障旅客最多 1 位必要陪伴者',
+    path: ['disabledCompanion'],
+  })
+  .refine((g) => g.offshoreResidentCount <= countTravelers(g), {
+    message: '離島居民人數不能多於同行總人數',
+    path: ['offshoreResidentCount'],
+  });
 export type IdentityCounts = Record<IdentityKey, number> & {
-  offshoreResident: boolean;
+  offshoreResidentCount: number;
 };
+
+export function countTravelers(g: Record<IdentityKey, number>): number {
+  return IdentityKeySchema.options.reduce((sum, key) => sum + g[key], 0);
+}
 
 export const TravelPassOwnedSchema = z.object({
   seniorCardCounty: z.string().min(1).optional(),
