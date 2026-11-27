@@ -15,8 +15,9 @@ export const mockPenghuTripPlan: TripPlanResult = {
       senior65Plus: 1,
       child3To12: 1,
       infantUnder3: 0,
-      disabledWithCompanion: 0,
-      offshoreResident: false,
+      disabled: 0,
+      disabledCompanion: 0,
+      offshoreResidentCount: 0,
     },
     passes: {
       seniorCardCounty: '台北市',
@@ -363,8 +364,9 @@ export const mockTainanTripPlan: TripPlanResult = {
       senior65Plus: 0,
       child3To12: 0,
       infantUnder3: 0,
-      disabledWithCompanion: 0,
-      offshoreResident: false,
+      disabled: 0,
+      disabledCompanion: 0,
+      offshoreResidentCount: 0,
     },
     passes: {
       tpassRegion: 'central',

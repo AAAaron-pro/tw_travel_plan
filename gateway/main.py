@@ -25,7 +25,7 @@ ALLOWED_OLLAMA_HOSTS = {"127.0.0.1", "localhost", "::1"}
 DEFAULT_CORS_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://taiwan-trip-planner.github.io",
+    "https://aaaaron-pro.github.io",  # GitHub Pages of AAAaron-pro/tw_travel_plan
 ]
 
 CORE_REQUIRED_TRIP_FIELDS = [
@@ -222,7 +222,8 @@ IdentityKey = Literal[
     "senior65Plus",
     "child3To12",
     "infantUnder3",
-    "disabledWithCompanion",
+    "disabled",
+    "disabledCompanion",
 ]
 
 
@@ -234,8 +235,9 @@ class ParsedIdentityCounts(BaseModel):
     senior65Plus: int = Field(default=0, ge=0)
     child3To12: int = Field(default=0, ge=0)
     infantUnder3: int = Field(default=0, ge=0)
-    disabledWithCompanion: int = Field(default=0, ge=0)
-    offshoreResident: bool = False
+    disabled: int = Field(default=0, ge=0)
+    disabledCompanion: int = Field(default=0, ge=0)
+    offshoreResidentCount: int = Field(default=0, ge=0)
 
     def total_people(self) -> int:
         return (
@@ -244,7 +246,8 @@ class ParsedIdentityCounts(BaseModel):
             + self.senior65Plus
             + self.child3To12
             + self.infantUnder3
-            + self.disabledWithCompanion
+            + self.disabled
+            + self.disabledCompanion
         )
 
 
@@ -374,8 +377,9 @@ PARSE_SYSTEM_PROMPT = (
     "- budgetPerPersonTwd: 每人預算整數（新台幣）\n"
     "- lodgingTier: budget | standard | premium | none\n"
     "- roomCount: 房間數整數\n"
-    "- group: {adult, collegeStudent, senior65Plus, child3To12, infantUnder3, "
-    "disabledWithCompanion, offshoreResident}\n"
+    "- group: 各身分人數整數 {adult, collegeStudent, senior65Plus, child3To12, infantUnder3, "
+    "disabled（身心障礙者）, disabledCompanion（必要陪伴者）, "
+    "offshoreResidentCount（設籍澎金馬等離島的人數）}\n"
     "- passes: {seniorCardCounty, tpassRegion (north|central|south|east|none)}\n"
     "- preferredTransport: 陣列，元素為 hsr | tra | domestic_air | ferry | "
     "taiwan_tourist_shuttle | rental_car | scooter | youbike\n"
