@@ -65,9 +65,7 @@ export const IdentityCountsSchema = z
     message: '離島居民人數不能多於同行總人數',
     path: ['offshoreResidentCount'],
   });
-export type IdentityCounts = Record<IdentityKey, number> & {
-  offshoreResidentCount: number;
-};
+export type IdentityCounts = z.infer<typeof IdentityCountsSchema>;
 
 export function countTravelers(g: Record<IdentityKey, number>): number {
   return IdentityKeySchema.options.reduce((sum, key) => sum + g[key], 0);
@@ -77,10 +75,7 @@ export const TravelPassOwnedSchema = z.object({
   seniorCardCounty: z.string().min(1).optional(),
   tpassRegion: z.enum(['north', 'central', 'south', 'east', 'none']).optional(),
 });
-export type TravelPassOwned = {
-  seniorCardCounty?: string;
-  tpassRegion?: 'north' | 'central' | 'south' | 'east' | 'none';
-};
+export type TravelPassOwned = z.infer<typeof TravelPassOwnedSchema>;
 
 export const TransportPreferenceSchema = z.enum([
   'hsr',
@@ -169,20 +164,7 @@ export const TripInputSchema = z.object({
   pace: z.enum(['relaxed', 'balanced', 'packed']),
   avoidRainOutdoor: z.boolean().optional(),
 });
-export type TripInput = {
-  origin: OriginRegion;
-  destination: RegionCode;
-  startDate: string;
-  days: number;
-  budgetPerPersonTwd: number;
-  lodgingTier: LodgingTier;
-  roomCount?: number;
-  group: IdentityCounts;
-  passes: TravelPassOwned;
-  preferredTransport: TransportPreference[];
-  pace: 'relaxed' | 'balanced' | 'packed';
-  avoidRainOutdoor?: boolean;
-};
+export type TripInput = z.infer<typeof TripInputSchema>;
 
 // ============================================================================
 // 2. Output Contract Types & Zod Schemas
@@ -201,8 +183,8 @@ export const TransportLegSchema = z.object({
   mode: TransportPreferenceSchema,
   from: z.string().min(1),
   to: z.string().min(1),
-  departureTime: z.string().min(1).optional(),
-  arrivalTime: z.string().min(1).optional(),
+  departureTime: z.string().regex(TIME_HH_MM_RE, '出發時間格式須為 HH:MM').optional(),
+  arrivalTime: z.string().regex(TIME_HH_MM_RE, '抵達時間格式須為 HH:MM').optional(),
   estimatedMinutes: z.number().int().min(1),
   source: z.enum(['tdx_live', 'tdx_static', 'ferry_fallback', 'distance_estimate']),
   sourceUrl: HttpUrlSchema.optional(),
@@ -210,19 +192,7 @@ export const TransportLegSchema = z.object({
   discountNotes: z.array(z.string()),
   seaRisk: SeaRiskInfoSchema.optional(),
 });
-export type TransportLeg = {
-  mode: TransportPreference;
-  from: string;
-  to: string;
-  departureTime?: string;
-  arrivalTime?: string;
-  estimatedMinutes: number;
-  source: 'tdx_live' | 'tdx_static' | 'ferry_fallback' | 'distance_estimate';
-  sourceUrl?: string;
-  groupTotalFareTwd: number;
-  discountNotes: string[];
-  seaRisk?: { level: SeaRiskLevel; waveHeightM?: number; warning?: string };
-};
+export type TransportLeg = z.infer<typeof TransportLegSchema>;
 
 export const CuratedSpotSchema = z.object({
   id: z.string().min(1),
@@ -239,21 +209,7 @@ export const CuratedSpotSchema = z.object({
   source: z.enum(['curated', 'tdx_v2']),
   tips: z.string().min(1).optional(),
 });
-export type CuratedSpot = {
-  id: string;
-  region: RegionCode;
-  name: string;
-  category: 'sightseeing' | 'food' | 'indoor_backup' | 'lodging';
-  lat: number;
-  lng: number;
-  stayMinutes: number;
-  closedDays: number[];
-  isIndoor: boolean;
-  wheelchairAndStrollerFriendly: boolean;
-  estimatedCostTwd: number;
-  source: 'curated' | 'tdx_v2';
-  tips?: string;
-};
+export type CuratedSpot = z.infer<typeof CuratedSpotSchema>;
 
 export const DayStopSchema = z.object({
   stopId: z.string().min(1),
@@ -264,15 +220,7 @@ export const DayStopSchema = z.object({
   backupSpot: CuratedSpotSchema.optional(),
   googleMapsUrl: HttpUrlSchema,
 });
-export type DayStop = {
-  stopId: string;
-  spot: CuratedSpot;
-  startTime: string;
-  endTime: string;
-  isUsingBackup?: boolean;
-  backupSpot?: CuratedSpot;
-  googleMapsUrl: string;
-};
+export type DayStop = z.infer<typeof DayStopSchema>;
 
 export const DayPlanSchema = z.object({
   dayIndex: z.number().int().min(1),
@@ -283,17 +231,11 @@ export const DayPlanSchema = z.object({
   legs: z.array(TransportLegSchema),
   stops: z.array(DayStopSchema),
   googleMapsRouteUrl: HttpUrlSchema,
+}).refine((d) => new Date(`${d.date}T00:00:00Z`).getUTCDay() === d.weekday, {
+  message: 'weekday 須與 date 的星期一致（0 = 週日）',
+  path: ['weekday'],
 });
-export type DayPlan = {
-  dayIndex: number;
-  date: string;
-  weekday: number;
-  isHolidayOrWeekend: boolean;
-  seaRisk?: { level: SeaRiskLevel; waveHeightM?: number; warning?: string };
-  legs: TransportLeg[];
-  stops: DayStop[];
-  googleMapsRouteUrl: string;
-};
+export type DayPlan = z.infer<typeof DayPlanSchema>;
 
 export const IdentityCostShareSchema = z.object({
   identity: IdentityKeySchema,
@@ -304,15 +246,7 @@ export const IdentityCostShareSchema = z.object({
   totalPerPersonTwd: z.number().int().min(0),
   appliedDiscounts: z.array(z.string()),
 });
-export type IdentityCostShare = {
-  identity: IdentityKey;
-  count: number;
-  transportPerPersonTwd: number;
-  lodgingPerPersonTwd: number;
-  activityPerPersonTwd: number;
-  totalPerPersonTwd: number;
-  appliedDiscounts: string[];
-};
+export type IdentityCostShare = z.infer<typeof IdentityCostShareSchema>;
 
 export const WeekdayShiftSavingHintSchema = z.object({
   suggestedStartDate: calendarDateSchema('建議日期格式須為 YYYY-MM-DD'),
@@ -339,22 +273,7 @@ export const BudgetBreakdownSchema = z.object({
     b.discountedTotalTwd,
   { message: '各身分分帳加總加上尾差須等於優惠後總額', path: ['roundingRemainderTwd'] }
 );
-export type BudgetBreakdown = {
-  originalTotalTwd: number;
-  discountedTotalTwd: number;
-  savedTotalTwd: number;
-  transportTwd: number;
-  lodgingTwd: number;
-  activityAndFoodTwd: number;
-  isOverBudget: boolean;
-  weekdayShiftSavingHint?: {
-    suggestedStartDate: string;
-    estimatedSaveTwd: number;
-    reason: string;
-  };
-  perIdentitySplit: IdentityCostShare[];
-  roundingRemainderTwd: number;
-};
+export type BudgetBreakdown = z.infer<typeof BudgetBreakdownSchema>;
 
 export const ReviewWarningSchema = z.object({
   severity: z.enum(['red', 'amber', 'info']),
@@ -362,12 +281,7 @@ export const ReviewWarningSchema = z.object({
   message: z.string().min(1),
   dayIndex: z.number().int().min(1).optional(),
 });
-export type ReviewWarning = {
-  severity: 'red' | 'amber' | 'info';
-  code: 'CLOSED_DAY' | 'TIGHT_TRANSFER' | 'OVER_BUDGET' | 'SEA_RISK' | 'HOLIDAY_SURGE';
-  message: string;
-  dayIndex?: number;
-};
+export type ReviewWarning = z.infer<typeof ReviewWarningSchema>;
 
 export const TripPlanResultSchema = z.object({
   input: TripInputSchema,
@@ -381,12 +295,4 @@ export const TripPlanResultSchema = z.object({
     .regex(ISO_DATETIME_RE, '時間戳記須為 ISO-8601 格式')
     .refine(isValidIsoDateTime, '時間戳記須為有效的 ISO-8601 日期時間'),
 });
-export type TripPlanResult = {
-  input: TripInput;
-  days: DayPlan[];
-  budget: BudgetBreakdown;
-  reviewWarnings: ReviewWarning[];
-  aiSummary?: string;
-  modeUsed: 'ai_assisted' | 'rule_only';
-  generatedAt: string;
-};
+export type TripPlanResult = z.infer<typeof TripPlanResultSchema>;

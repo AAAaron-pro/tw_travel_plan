@@ -543,3 +543,22 @@ async def test_queue_wait_deadline_turns_into_queue_full():
 
     # The timed-out waiter released its queue spot
     assert guard.in_flight == 0
+
+
+def test_python_enums_match_schema_trip_ts():
+    """The gateway hand-copies the contract enums; fail as soon as schema/trip.ts changes without it."""
+    import re
+    import typing
+
+    import main
+
+    trip_ts = (Path(__file__).resolve().parent.parent / "schema" / "trip.ts").read_text(encoding="utf-8")
+    ts_enums = {
+        name: re.findall(r"'([^']+)'", body)
+        for name, body in re.findall(r"export const (\w+)Schema = z\.enum\(\[(.*?)\]\)", trip_ts, re.DOTALL)
+    }
+
+    for name in ["OriginRegion", "RegionCode", "TransportPreference", "LodgingTier", "IdentityKey"]:
+        assert list(typing.get_args(getattr(main, name))) == ts_enums[name], name
+
+    assert set(main.ParsedIdentityCounts.model_fields) == set(ts_enums["IdentityKey"]) | {"offshoreResidentCount"}
