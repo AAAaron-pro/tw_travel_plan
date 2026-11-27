@@ -11,9 +11,13 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from main import (  # noqa: E402
+    ConcurrencyGuard,
     GatewaySettings,
+    QueueFullError,
     SlidingWindowRateLimiter,
+    clamp_summary,
     create_app,
+    find_ungrounded_numbers,
     parse_cors_origins,
     validate_loopback_ollama_url,
 )
@@ -198,9 +202,12 @@ async def test_summarize_enforces_150_chars_and_anti_fabrication_prompt():
     body = resp.json()
     assert len(body["summary"]) <= 150
     assert body["charCount"] == len(body["summary"])
-    assert body["summary"].endswith("…")
+    # Cut at the last full sentence instead of mid-number
+    assert body["summary"].endswith("。")
+    assert "NT$ 31,900" in body["summary"]
     assert captured_payload["model"] == "qwen3.5:4b"
     assert captured_payload["options"] == {"num_ctx": 4096}
+    assert captured_payload["think"] is False
     system_msg = captured_payload["messages"][0]["content"]
     assert "嚴禁捏造" in system_msg
 
@@ -486,3 +493,53 @@ def test_rate_limiter_prunes_expired_ip_deques():
     # After 60s from first IP and 60s from second IP, expired buckets are deleted
     assert limiter.check("198.51.100.3", now=75.0) == (True, 0)
     assert list(limiter._hits.keys()) == ["198.51.100.3"]
+
+
+async def post_summarize(ollama_reply: str) -> httpx.Response:
+    async def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"message": {"content": ollama_reply}})
+
+    mock_client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    app = create_app(settings=GatewaySettings(), http_client=mock_client)
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app),
+        base_url="http://testserver",
+    ) as client:
+        resp = await client.post("/api/summarize", json=make_summary_payload())
+
+    await mock_client.aclose()
+    return resp
+
+
+@pytest.mark.asyncio
+async def test_summarize_strips_think_block_and_rejects_invented_numbers():
+    ok = await post_summarize("<think>先算 31900 / 3</think>全團 NT$ 31,900，比原價省 NT$ 4,600。")
+    assert ok.status_code == 200
+    assert ok.json()["summary"] == "全團 NT$ 31,900，比原價省 NT$ 4,600。"
+
+    # NT$ 6,000 never appears in the deterministic input
+    invented = await post_summarize("全團 NT$ 31,900，每人大約 NT$ 6,000。")
+    assert invented.status_code == 502
+
+
+def test_find_ungrounded_numbers_and_clamp_fallback():
+    source = '{"discountedTotalTwd": 31900, "startDate": "2026-12-11", "days": 3}'
+    assert find_ungrounded_numbers("12/11 出發玩 3 天，共 NT$ 31,900。", source) == []
+    assert find_ungrounded_numbers("每人 NT$ 6,000", source) == ["6,000"]
+
+    # No sentence end inside the limit: fall back to a hard cut with an ellipsis
+    assert clamp_summary("好" * 200) == "好" * 149 + "…"
+
+
+@pytest.mark.asyncio
+async def test_queue_wait_deadline_turns_into_queue_full():
+    guard = ConcurrencyGuard(max_concurrent=1, max_waiting=3, max_wait_seconds=0.05)
+
+    async with guard.acquire_slot():
+        with pytest.raises(QueueFullError):
+            async with guard.acquire_slot():
+                pass
+
+    # The timed-out waiter released its queue spot
+    assert guard.in_flight == 0

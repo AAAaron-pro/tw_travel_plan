@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import time
 from collections import deque
 from contextlib import asynccontextmanager
@@ -77,6 +78,8 @@ class GatewaySettings:
     )
     max_concurrent: int = 1
     max_waiting: int = 3
+    # 前端 10 秒就放棄：排隊超過 5 秒就算排不到，別讓主機替已離開的人推論
+    max_wait_seconds: float = 5.0
     rate_limit_requests: int = field(
         default_factory=lambda: int(os.getenv("RATE_LIMIT_REQUESTS", "20"))
     )
@@ -107,10 +110,13 @@ class QueueFullError(Exception):
 
 
 class ConcurrencyGuard:
-    def __init__(self, max_concurrent: int = 1, max_waiting: int = 3) -> None:
+    def __init__(
+        self, max_concurrent: int = 1, max_waiting: int = 3, max_wait_seconds: float = 5.0
+    ) -> None:
         self.semaphore = asyncio.Semaphore(max_concurrent)
         self.max_concurrent = max_concurrent
         self.max_waiting = max_waiting
+        self.max_wait_seconds = max_wait_seconds
         self.max_total = max_concurrent + max_waiting
         self.in_flight = 0
         self.active = 0
@@ -121,7 +127,10 @@ class ConcurrencyGuard:
             raise QueueFullError()
         self.in_flight += 1
         try:
-            await self.semaphore.acquire()
+            try:
+                await asyncio.wait_for(self.semaphore.acquire(), timeout=self.max_wait_seconds)
+            except asyncio.TimeoutError as exc:
+                raise QueueFullError() from exc
             self.active += 1
             try:
                 yield
@@ -413,14 +422,30 @@ def compute_missing_fields(parsed: ParsedTripInput) -> list[str]:
     return missing
 
 
+THINK_BLOCK_RE = re.compile(r"<think>.*?(</think>|$)", re.DOTALL)
+NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
+
+
 def clamp_summary(raw_text: str, max_chars: int = 150) -> str:
-    cleaned = raw_text.strip().strip('"').strip("'").replace("\r", " ").replace("\n", " ")
+    cleaned = THINK_BLOCK_RE.sub(" ", raw_text)
+    cleaned = cleaned.strip().strip('"').strip("'").replace("\r", " ").replace("\n", " ")
     cleaned = " ".join(cleaned.split())
     if not cleaned:
         raise ValueError("Ollama returned empty summary text")
     if len(cleaned) <= max_chars:
         return cleaned
+    head = cleaned[:max_chars]
+    # 切在最後一個句號，避免把「NT$ 31,900」切成「NT$ 31,9…」
+    sentence_end = max(head.rfind(mark) for mark in "。！？")
+    if sentence_end >= 0:
+        return head[: sentence_end + 1]
     return cleaned[: max_chars - 1] + "…"
+
+
+def find_ungrounded_numbers(summary: str, source_json: str) -> list[str]:
+    """Numbers in the summary that never appear in the deterministic input it was written from."""
+    allowed = {n.replace(",", "") for n in NUMBER_RE.findall(source_json)}
+    return [n for n in NUMBER_RE.findall(summary) if n.replace(",", "") not in allowed]
 
 
 # ============================================================================
@@ -436,6 +461,7 @@ def create_app(
     guard = ConcurrencyGuard(
         max_concurrent=cfg.max_concurrent,
         max_waiting=cfg.max_waiting,
+        max_wait_seconds=cfg.max_wait_seconds,
     )
     rate_limiter = SlidingWindowRateLimiter(
         max_requests=cfg.rate_limit_requests,
@@ -481,6 +507,7 @@ def create_app(
 
     async def call_ollama_chat(
         *,
+        request: Request,
         system_prompt: str,
         user_content: str,
         json_mode: bool,
@@ -488,6 +515,8 @@ def create_app(
         payload: dict[str, Any] = {
             "model": cfg.ollama_model,
             "stream": False,
+            # Qwen 系列預設會先「思考」：吃掉 10 秒推論時間，還可能把 <think> 文字回給前端
+            "think": False,
             "options": {"num_ctx": cfg.ollama_num_ctx},
             "messages": [
                 {"role": "system", "content": system_prompt},
@@ -500,6 +529,8 @@ def create_app(
         endpoint = f"{cfg.ollama_base_url}/api/chat"
         try:
             async with guard.acquire_slot():
+                if await request.is_disconnected():
+                    raise HTTPException(status_code=499, detail="旅客已離開，略過推論。")
                 resp = await client.post(
                     endpoint,
                     json=payload,
@@ -552,8 +583,9 @@ def create_app(
         response_model=ParseInputResponse,
         dependencies=[Depends(enforce_rate_limit)],
     )
-    async def parse_input(req: ParseInputRequest) -> ParseInputResponse:
+    async def parse_input(req: ParseInputRequest, request: Request) -> ParseInputResponse:
         raw_json = await call_ollama_chat(
+            request=request,
             system_prompt=PARSE_SYSTEM_PROMPT,
             user_content=req.text,
             json_mode=True,
@@ -584,9 +616,10 @@ def create_app(
         response_model=SummarizeResponse,
         dependencies=[Depends(enforce_rate_limit)],
     )
-    async def summarize(req: SummarizeRequest) -> SummarizeResponse:
+    async def summarize(req: SummarizeRequest, request: Request) -> SummarizeResponse:
         user_payload = json.dumps(req.model_dump(mode="json"), ensure_ascii=False)
         raw_text = await call_ollama_chat(
+            request=request,
             system_prompt=SUMMARIZE_SYSTEM_PROMPT,
             user_content=user_payload,
             json_mode=False,
@@ -598,6 +631,13 @@ def create_app(
                 status_code=502,
                 detail="主機產出的導讀內容為空。",
             ) from exc
+
+        # 專案鐵律：導讀不能出現輸入裡沒有的數字，有就整段作廢，前端改用規則版文案
+        if find_ungrounded_numbers(summary, user_payload):
+            raise HTTPException(
+                status_code=502,
+                detail="主機導讀出現輸入以外的數字，已退回規則文案。",
+            )
 
         return SummarizeResponse(summary=summary, charCount=len(summary))
 
