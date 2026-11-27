@@ -14,7 +14,7 @@
    - 一律從最新 `main` 切出 `feat/<角色>-<主題>` 分支開發並推送功能分支，再依 `.github/pull_request_template.md` 發起 Pull Request（若使用 `/backup` 技能亦須依此分支＋PR 流程執行）。
 
 3. **禁止私自改動根目錄依賴檔**：
-   - 專案已預裝 `react`、`zod`、`lucide-react`、`vite-plugin-pwa`、`leaflet`、`react-leaflet` 與 `@types/leaflet`。
+   - 專案已預裝 `react`、`zod`、`lucide-react`、`vite-plugin-pwa`、`leaflet`、`react-leaflet`、`@types/leaflet`，以及元件測試用的 `jsdom`、`@testing-library/react`、`@testing-library/dom`（測試檔開頭加 `// @vitest-environment jsdom`）。
    - 非架構師分支禁止執行會改寫 `package.json` 或 `package-lock.json` 的安裝指令，有新套件需求請先請架構師統一加進 `main`。
 
 4. **介面美學、觸控與台灣在地口語**：

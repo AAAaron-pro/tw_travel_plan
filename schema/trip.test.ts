@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { z } from 'zod';
 import {
   BudgetBreakdownSchema,
   countTravelers,
@@ -19,8 +18,6 @@ import {
   TripInputSchema,
   TripPlanResultSchema,
   WeekdayShiftSavingHintSchema,
-  type TripInput,
-  type TripPlanResult,
 } from './trip';
 import {
   MOCK_TRIP_PLANS,
@@ -39,17 +36,9 @@ const emptyGroup = {
   offshoreResidentCount: 0,
 };
 
-// Compile-time bidirectionality checks: Zod inferred types must remain mutually assignable with TS types
-type AssertAssignable<To, From extends To> = [To, From] | boolean;
-
-describe('schema/trip.ts bidirectional contract & Zod validation', () => {
+// TS types are z.infer of the schemas, so types and validation cannot drift apart
+describe('schema/trip.ts contract & Zod validation', () => {
   it('validates all enum and atomic sub-schemas cleanly', () => {
-    const inputToTs: AssertAssignable<TripInput, z.infer<typeof TripInputSchema>> = true;
-    const tsToInput: AssertAssignable<z.infer<typeof TripInputSchema>, TripInput> = true;
-    const resultToTs: AssertAssignable<TripPlanResult, z.infer<typeof TripPlanResultSchema>> = true;
-    const tsToResult: AssertAssignable<z.infer<typeof TripPlanResultSchema>, TripPlanResult> = true;
-    expect(inputToTs && tsToInput && resultToTs && tsToResult).toBe(true);
-
     expect(OriginRegionSchema.safeParse('taipei_keelung').success).toBe(true);
     expect(RegionCodeSchema.safeParse('penghu').success).toBe(true);
     expect(LodgingTierSchema.safeParse('standard').success).toBe(true);
@@ -193,6 +182,17 @@ describe('schema/trip.ts bidirectional contract & Zod validation', () => {
     expect(tainanModes).toContain('taiwan_tourist_shuttle');
     expect(mockTainanTripPlan.budget.weekdayShiftSavingHint).toBeDefined();
     expect(mockTainanTripPlan.budget.weekdayShiftSavingHint?.estimatedSaveTwd).toBeGreaterThan(0);
+  });
+
+  it('applies the same HH:MM rule to legs and checks weekday against date', () => {
+    const leg = mockPenghuTripPlan.days[0].legs[0];
+    expect(TransportLegSchema.safeParse({ ...leg, departureTime: '明天早上' }).success).toBe(false);
+    expect(TransportLegSchema.safeParse({ ...leg, arrivalTime: '9:35' }).success).toBe(false);
+
+    // 2026-12-11 is a Friday (5)
+    const day = mockPenghuTripPlan.days[0];
+    expect(day.weekday).toBe(5);
+    expect(DayPlanSchema.safeParse({ ...day, weekday: 1 }).success).toBe(false);
   });
 
   it('counts disabled travelers, companions and offshore residents as head counts', () => {

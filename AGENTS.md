@@ -26,5 +26,5 @@
   - **優惠精算師**：`engine/`（及個人認領之 `data/curated/` 區段）
   - **介面設計師**：`src/`（及個人認領之 `data/curated/` 區段）
 - **禁直推 `main`**：倉庫已啟用 `protect-main` 分支保護。任何 AI 收到「儲存／上傳／commit／push」時，**嚴禁**在 `main` 上直接提交、本地 `merge` 或 `git push origin main`，亦禁止 `--force`。若目前位於 `main`，必須先切出 `feat/<角色>-<主題>` 分支後再推送並發起 Pull Request。
-- **依賴鎖定規則**：根目錄 `package.json` 與 `package-lock.json` 已預裝 `leaflet`、`react-leaflet`、`zod`、`lucide-react`、`vite-plugin-pwa`。非架構師分支禁止執行會改動根目錄依賴檔的套件安裝指令（缺套件由架構師統一更新進 `main`）。
+- **依賴鎖定規則**：根目錄 `package.json` 與 `package-lock.json` 已預裝 `leaflet`、`react-leaflet`、`zod`、`lucide-react`、`vite-plugin-pwa`、`jsdom`、`@testing-library/react`、`@testing-library/dom`。非架構師分支禁止執行會改動根目錄依賴檔的套件安裝指令（缺套件由架構師統一更新進 `main`）。
 - **推送前必跑三項檢查**：任何分支推送前必須於本機通過 `npm run typecheck`、`npx vitest run`、`npm run build`，並以 `git diff --stat` 確認未越界改動他人目錄或共用 `schema/`。
