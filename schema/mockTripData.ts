@@ -326,6 +326,7 @@ export const mockPenghuTripPlan: TripPlanResult = {
         appliedDiscounts: ['國內線機票兒童 75 折', '離島客輪兒童半價'],
       },
     ],
+    roundingRemainderTwd: 0,
   },
   reviewWarnings: [
     {
@@ -619,6 +620,7 @@ export const mockTainanTripPlan: TripPlanResult = {
         appliedDiscounts: ['高鐵大學生 5 折優惠', '奇美博物館學生票'],
       },
     ],
+    roundingRemainderTwd: 0,
   },
   reviewWarnings: [
     {

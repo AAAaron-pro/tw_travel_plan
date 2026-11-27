@@ -15,7 +15,7 @@ import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 # ============================================================================
 # Configuration & Loopback Isolation
@@ -87,7 +87,8 @@ class GatewaySettings:
         default_factory=lambda: parse_cors_origins(os.getenv("CORS_ORIGINS"))
     )
     trust_proxy_headers: bool = field(
-        default_factory=lambda: os.getenv("TRUST_PROXY_HEADERS", "false").lower() == "true"
+        # 預設 true：閘道只綁 127.0.0.1、靠 cloudflared 對外，不讀 CF-Connecting-IP 會讓全站共用同一個限流額度
+        default_factory=lambda: os.getenv("TRUST_PROXY_HEADERS", "true").lower() == "true"
     )
 
     def __post_init__(self) -> None:
@@ -164,7 +165,7 @@ class SlidingWindowRateLimiter:
 
 def extract_client_ip(request: Request, trust_proxy_headers: bool) -> str:
     peer_host = request.client.host if request.client else "unknown"
-    if trust_proxy_headers and peer_host in {"127.0.0.1", "::1", "testclient"}:
+    if trust_proxy_headers and peer_host in {"127.0.0.1", "::1"}:
         cf_ip = request.headers.get("CF-Connecting-IP")
         if cf_ip:
             return cf_ip.strip()
@@ -327,6 +328,7 @@ class SummarizeBudget(BaseModel):
     isOverBudget: bool
     weekdayShiftSavingHint: WeekdayShiftSavingHint | None = None
     perIdentitySplit: list[SummarizeIdentityShare] = Field(..., min_length=1)
+    roundingRemainderTwd: int
 
 
 class SummarizeWarning(BaseModel):
@@ -554,7 +556,16 @@ def create_app(
         )
         try:
             data = json.loads(raw_json)
-            parsed = ParsedTripInput.model_validate(data)
+            if not isinstance(data, dict):
+                raise ValueError("Ollama JSON must be an object")
+            try:
+                parsed = ParsedTripInput.model_validate(data)
+            except ValidationError as exc:
+                # 小模型常只猜錯一兩格：丟掉出錯的欄位，交給 missingFields 讓使用者補
+                bad_keys = {err["loc"][0] for err in exc.errors() if err["loc"]}
+                parsed = ParsedTripInput.model_validate(
+                    {k: v for k, v in data.items() if k not in bad_keys}
+                )
         except Exception as exc:
             raise HTTPException(
                 status_code=502,

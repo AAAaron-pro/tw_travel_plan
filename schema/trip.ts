@@ -152,7 +152,7 @@ export const TripInputSchema = z.object({
   destination: RegionCodeSchema,
   startDate: calendarDateSchema('出發日期格式須為 YYYY-MM-DD'),
   days: z.number().int().min(1).max(30),
-  budgetPerPersonTwd: z.number().min(0),
+  budgetPerPersonTwd: z.number().int().min(0),
   lodgingTier: LodgingTierSchema,
   roomCount: z.number().int().min(1).optional(),
   group: IdentityCountsSchema,
@@ -198,7 +198,7 @@ export const TransportLegSchema = z.object({
   estimatedMinutes: z.number().int().min(1),
   source: z.enum(['tdx_live', 'tdx_static', 'ferry_fallback', 'distance_estimate']),
   sourceUrl: HttpUrlSchema.optional(),
-  groupTotalFareTwd: z.number().min(0),
+  groupTotalFareTwd: z.number().int().min(0),
   discountNotes: z.array(z.string()),
   seaRisk: SeaRiskInfoSchema.optional(),
 });
@@ -227,7 +227,7 @@ export const CuratedSpotSchema = z.object({
   closedDays: z.array(z.number().int().min(0).max(6)),
   isIndoor: z.boolean(),
   wheelchairAndStrollerFriendly: z.boolean(),
-  estimatedCostTwd: z.number().min(0),
+  estimatedCostTwd: z.number().int().min(0),
   source: z.enum(['curated', 'tdx_v2']),
   tips: z.string().min(1).optional(),
 });
@@ -290,10 +290,10 @@ export type DayPlan = {
 export const IdentityCostShareSchema = z.object({
   identity: IdentityKeySchema,
   count: z.number().int().min(1),
-  transportPerPersonTwd: z.number().min(0),
-  lodgingPerPersonTwd: z.number().min(0),
-  activityPerPersonTwd: z.number().min(0),
-  totalPerPersonTwd: z.number().min(0),
+  transportPerPersonTwd: z.number().int().min(0),
+  lodgingPerPersonTwd: z.number().int().min(0),
+  activityPerPersonTwd: z.number().int().min(0),
+  totalPerPersonTwd: z.number().int().min(0),
   appliedDiscounts: z.array(z.string()),
 });
 export type IdentityCostShare = {
@@ -308,21 +308,29 @@ export type IdentityCostShare = {
 
 export const WeekdayShiftSavingHintSchema = z.object({
   suggestedStartDate: calendarDateSchema('建議日期格式須為 YYYY-MM-DD'),
-  estimatedSaveTwd: z.number().min(0),
+  estimatedSaveTwd: z.number().int().min(0),
   reason: z.string().min(1),
 });
 
 export const BudgetBreakdownSchema = z.object({
-  originalTotalTwd: z.number().min(0),
-  discountedTotalTwd: z.number().min(0),
-  savedTotalTwd: z.number().min(0),
-  transportTwd: z.number().min(0),
-  lodgingTwd: z.number().min(0),
-  activityAndFoodTwd: z.number().min(0),
+  originalTotalTwd: z.number().int().min(0),
+  discountedTotalTwd: z.number().int().min(0),
+  savedTotalTwd: z.number().int().min(0),
+  transportTwd: z.number().int().min(0),
+  lodgingTwd: z.number().int().min(0),
+  activityAndFoodTwd: z.number().int().min(0),
   isOverBudget: z.boolean(),
   weekdayShiftSavingHint: WeekdayShiftSavingHintSchema.optional(),
   perIdentitySplit: z.array(IdentityCostShareSchema).min(1),
-});
+  // 尾差 = discountedTotalTwd − Σ(count × totalPerPersonTwd)；整數分帳除不盡時由它補平，可為負
+  roundingRemainderTwd: z.number().int(),
+}).refine(
+  (b) =>
+    b.perIdentitySplit.reduce((sum, s) => sum + s.count * s.totalPerPersonTwd, 0) +
+      b.roundingRemainderTwd ===
+    b.discountedTotalTwd,
+  { message: '各身分分帳加總加上尾差須等於優惠後總額', path: ['roundingRemainderTwd'] }
+);
 export type BudgetBreakdown = {
   originalTotalTwd: number;
   discountedTotalTwd: number;
@@ -337,6 +345,7 @@ export type BudgetBreakdown = {
     reason: string;
   };
   perIdentitySplit: IdentityCostShare[];
+  roundingRemainderTwd: number;
 };
 
 export const ReviewWarningSchema = z.object({
