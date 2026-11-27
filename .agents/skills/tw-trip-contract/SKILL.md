@@ -19,7 +19,7 @@ description: 台灣國內與離島旅遊規劃網頁專案的團隊共用合約�
 | **介面設計師** | `src/`（及個人認領的 `data/curated/` 區段） | `schema/`、`services/`、`engine/` |
 
 - 若開發過程發現 `schema/trip.ts` 缺少欄位，必須**立即停止改動共用檔**，輸出 `SCHEMA_CHANGE_REQUEST`（含欄位名稱、型別與用途說明）供架構師與全隊對齊後統一更新。
-- **依賴鎖定紀律**：根目錄 `package.json` 與 `package-lock.json` 已預裝 `leaflet`、`react-leaflet`、`@types/leaflet`、`zod`、`lucide-react`、`vite-plugin-pwa`。非架構師分支禁止執行會改動根目錄依賴檔的 `npm install <新套件>`；若確有新套件需求，請先告知架構師統一安裝。
+- **依賴鎖定紀律**：根目錄 `package.json` 與 `package-lock.json` 已預裝 `leaflet`、`react-leaflet`、`@types/leaflet`、`zod`、`lucide-react`、`vite-plugin-pwa`，以及元件測試用的 `jsdom`、`@testing-library/react`、`@testing-library/dom`（測試檔開頭加 `// @vitest-environment jsdom`）。非架構師分支禁止執行會改動根目錄依賴檔的 `npm install <新套件>`；若確有新套件需求，請先告知架構師統一安裝。
 
 ## 2. 雙向型別合約（`schema/trip.ts`）
 
