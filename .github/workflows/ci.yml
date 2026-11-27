@@ -22,6 +22,25 @@ jobs:
           git diff --name-only "FETCH_HEAD...HEAD" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Enforce role directory boundaries
+        if: github.event_name == 'pull_request'
+        env:
+          HEAD_REF: ${{ github.head_ref }} # via env: branch names are user-controlled
+        run: |
+          case "$HEAD_REF" in
+            feat/ui-*)          allowed='^(src/|data/curated/)' ;;
+            feat/fare-engine-*) allowed='^(engine/|data/curated/)' ;;
+            feat/route-intel-*) allowed='^(services/|data/)' ;;
+            *) echo "分支 $HEAD_REF 不在三個組員角色前綴內，略過目錄邊界檢查（架構師分支走 CODEOWNERS 審查）"; exit 0 ;;
+          esac
+          outside=$(git diff --name-only "FETCH_HEAD...HEAD" | grep -Ev "$allowed" || true)
+          if [ -n "$outside" ]; then
+            echo "::error::$HEAD_REF 只能修改符合 $allowed 的檔案，以下檔案越界（請還原，或改由架構師處理）："
+            echo "$outside"
+            exit 1
+          fi
+          echo "目錄邊界檢查通過"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
