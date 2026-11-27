@@ -1,0 +1,28 @@
+name: Deploy team plans to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/plans/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-plans
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upload docs/plans to taiwan-trip-plans.pages.dev
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy docs/plans --project-name=taiwan-trip-plans --branch=main --commit-dirty=true
