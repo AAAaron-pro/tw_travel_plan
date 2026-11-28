@@ -281,7 +281,7 @@
   <div class="page-shell">
     <nav class="top-nav" aria-label="計畫書快速切換">
       <div class="nav-group">
-        <a class="nav-link is-active" href="./master_project_plan.html">
+        <a class="nav-link is-active" href="./index.html">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
           <span>團隊總計畫書</span>
         </a>
@@ -387,12 +387,12 @@
 <h2>四、團隊共用工具箱、多 AI 協作與規範</h2>
 <h3>1. Agent Skills 與多 AI 提示規範（先掃描再導入）</h3>
 <blockquote><strong>安全提醒</strong>：從 GitHub 安裝任何外部 Skill 到各自電腦前，務必先用安全檢查工具（<code>skill-security-guard</code>）掃描 <code>SKILL.md</code> 與腳本，確認沒有隱藏指令注入或讀取本機憑證才啟用。</blockquote>
-<div class="table-scroll"><table><thead><tr><th>規範 / Skill 來源與路徑</th><th>適用對象</th><th>建議用法與解決什麼問題</th></tr></thead><tbody><tr><td><strong>跨 AI 提示規範檔案</strong><br><code>CLAUDE.md</code> / <code>.github/copilot-instructions.md</code> / <code>AGENTS.md</code></td><td><strong>全體 4 人（各家 AI）</strong></td><td>統一約束 Claude Code、GitHub Copilot、Cursor、ChatGPT 等各家 AI 夥伴，強制遵守目錄隔離、禁止直推 <code>main</code>、依賴鎖定與 Warm Tactile 設計規範。</td></tr><tr><td><strong>專案共用合約 Skill</strong><br><code>.agents/skills/tw-trip-contract/SKILL.md</code></td><td><strong>全體 4 人</strong></td><td>放在專案倉庫裡讓所有人的 AI 自動讀到：鎖定目錄隔離、TDX 5 次/分快取規矩、<code>TripInput</code>/<code>TripPlanResult</code> 合約與交付前自檢命令。</td></tr><tr><td><strong>安全備份與 PR 流程 Skill</strong><br><code>.agents/skills/backup/SKILL.md</code></td><td><strong>全體 4 人</strong></td><td>當夥伴說「儲存/備份/推上去」時觸發，自動切出 <code>feat/&lt;角色&gt;-&lt;主題&gt;</code> 分支並建立 PR，禁止直推 <code>main</code>，守護倉庫分支保護。</td></tr><tr><td><strong>已內建旅遊參考 Skills</strong><br><code>.agents/skills/trip-go/</code>、<code>trip-review/</code></td><td><strong>優惠精算師</strong></td><td>借鏡裡面已經踩過坑的「門到門真實緩衝公式」、「核心興趣排程骨架」與「22 項自動抓錯檢查表」，轉寫為台灣國旅純函式。</td></tr><tr><td><strong><code>vercel-labs/agent-skills</code></strong>（GitHub）<br>指令：<code>npx skills add vercel-labs/agent-skills</code></td><td><strong>介面設計師</strong></td><td>取用 <code>vercel-react-best-practices</code> 與 <code>web-design-guidelines</code>，防止 React 頁面出現多餘重繪、資料瀑布流與無障礙標籤漏缺。</td></tr><tr><td><strong><code>anthropics/skills</code></strong>（GitHub）<br>指令：<code>npx skills add anthropics/skills --skill frontend-design</code></td><td><strong>介面設計師</strong></td><td>搭配專案根目錄 <code>AGENTS.md</code>（已涵蓋反模板美學、平板 44px 觸控、台灣日常口語），確保頁面像人手打造而非通用 AI 樣板。</td></tr><tr><td><strong><code>cloudflare/security-audit-skill</code></strong>（GitHub）</td><td><strong>架構師、路線情報員</strong></td><td>Cloudflare Worker Proxy 與主機 FastAPI 閘道寫完後跑一次安全檢查，抓出 CORS 設太寬、Secret 誤印或未設限流的漏洞。</td></tr></tbody></table></div>
+<div class="table-scroll"><table><thead><tr><th>規範 / Skill 來源與路徑</th><th>適用對象</th><th>建議用法與解決什麼問題</th></tr></thead><tbody><tr><td><strong>跨 AI 提示規範檔案</strong><br><code>CLAUDE.md</code> / <code>.github/copilot-instructions.md</code> / <code>AGENTS.md</code></td><td><strong>全體 4 人（各家 AI）</strong></td><td>統一約束 Claude Code、GitHub Copilot、Cursor、ChatGPT 等各家 AI 夥伴，強制遵守目錄隔離、禁止直推 <code>main</code>、依賴鎖定與 Warm Tactile 設計規範。</td></tr><tr><td><strong>專案共用合約 Skill</strong><br><code>.agents/skills/tw-trip-contract/SKILL.md</code></td><td><strong>全體 4 人</strong></td><td>放在專案倉庫裡讓所有人的 AI 自動讀到：鎖定目錄隔離、TDX 5 次/分快取規矩、<code>TripInput</code>/<code>TripPlanResult</code> 合約與交付前自檢命令。</td></tr><tr><td><strong>安全備份與 PR 流程 Skill</strong><br><code>.agents/skills/backup/SKILL.md</code></td><td><strong>全體 4 人</strong></td><td>當夥伴說「儲存/備份/推上去」時觸發，自動切出 <code>feat/&lt;角色&gt;-&lt;主題&gt;</code> 分支並建立 PR，禁止直推 <code>main</code>，守護倉庫分支保護。</td></tr><tr><td><strong>旅遊邏輯參考文件</strong><br><code>docs/reference/trip-go.md</code>、<code>trip-review.md</code></td><td><strong>優惠精算師</strong></td><td>借鏡裡面已經踩過坑的「門到門真實緩衝公式」、「核心興趣排程骨架」與「22 項自動抓錯檢查表」，轉寫為台灣國旅純函式。</td></tr><tr><td><strong><code>vercel-labs/agent-skills</code></strong>（GitHub）<br>指令：<code>npx skills add vercel-labs/agent-skills</code></td><td><strong>介面設計師</strong></td><td>取用 <code>vercel-react-best-practices</code> 與 <code>web-design-guidelines</code>，防止 React 頁面出現多餘重繪、資料瀑布流與無障礙標籤漏缺。</td></tr><tr><td><strong><code>anthropics/skills</code></strong>（GitHub）<br>指令：<code>npx skills add anthropics/skills --skill frontend-design</code></td><td><strong>介面設計師</strong></td><td>搭配專案根目錄 <code>AGENTS.md</code>（已涵蓋反模板美學、平板 44px 觸控、台灣日常口語），確保頁面像人手打造而非通用 AI 樣板。</td></tr><tr><td><strong><code>cloudflare/security-audit-skill</code></strong>（GitHub）</td><td><strong>架構師、路線情報員</strong></td><td>Cloudflare Worker Proxy 與主機 FastAPI 閘道寫完後跑一次安全檢查，抓出 CORS 設太寬、Secret 誤印或未設限流的漏洞。</td></tr></tbody></table></div>
 <h3>2. 零元實戰開發工具與套件預裝清單</h3>
-<ul><li><strong>前端與建置（已預裝）</strong>：<code>Vite + React 19 + TypeScript (strict) + Tailwind CSS + lucide-react</code>。</li><li><strong>地圖與圖磚（已預裝，$0 免申請）</strong>：<code>leaflet</code>、<code>react-leaflet</code>、<code>@types/leaflet</code> 搭配<strong>內政部國土測繪中心 WMTS</strong>（<code>https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}</code>）。</li><li><strong>結構校驗與離線能力（已預裝）</strong>：<code>zod</code>（在 Runtime 把關主機 AI 吐出的 JSON 與外部 API 格式）、<code>vite-plugin-pwa</code>（離線看文字行程與預算）。</li><li><strong>測試工具</strong>：<code>Vitest</code> + <code>Testing Library</code>（純函式與元件測試）、<code>@cloudflare/vitest-pool-workers</code>（本機模擬 Cloudflare KV 與 Worker 路由）、<code>Playwright</code>（檢查手機 375px 與平板 768px/1024px 觸控熱區）。</li><li><strong>國定連假資料</strong>：政府資料開放平台「政府行政機關辦公日曆表」JSON（GitHub Actions 每年定期同步）。</li><li><strong>依賴鎖定鐵律</strong>：根目錄 <code>package.json</code> 與 <code>package-lock.json</code> 已預裝核心套件並由 <code>.github/CODEOWNERS</code> 鎖定由架構師維護，非架構師分支禁止自行安裝或升級根目錄依賴。</li></ul>
+<ul><li><strong>前端與建置（已預裝）</strong>：<code>Vite + React 19 + TypeScript (strict) + Tailwind CSS + lucide-react</code>。</li><li><strong>地圖與圖磚（已預裝，$0 免申請）</strong>：<code>leaflet</code>、<code>react-leaflet</code>、<code>@types/leaflet</code> 搭配<strong>內政部國土測繪中心 WMTS</strong>（<code>https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}</code>）。</li><li><strong>結構校驗與離線能力（已預裝）</strong>：<code>zod</code>（在 Runtime 把關主機 AI 吐出的 JSON 與外部 API 格式）、<code>vite-plugin-pwa</code>（離線看文字行程與預算）。</li><li><strong>測試工具</strong>：<code>Vitest</code> + <code>Testing Library</code> + <code>jsdom</code>（純函式與元件測試；後三者已預裝，元件測試檔開頭加 <code>// @vitest-environment jsdom</code>）、<code>@cloudflare/vitest-pool-workers</code>（本機模擬 Cloudflare KV 與 Worker 路由）、<code>Playwright</code>（檢查手機 375px 與平板 768px/1024px 觸控熱區）。</li><li><strong>國定連假資料</strong>：政府資料開放平台「政府行政機關辦公日曆表」JSON（GitHub Actions 每年定期同步）。</li><li><strong>依賴鎖定鐵律</strong>：根目錄 <code>package.json</code> 與 <code>package-lock.json</code> 已預裝核心套件並由 <code>.github/CODEOWNERS</code> 鎖定由架構師維護，非架構師分支禁止自行安裝或升級根目錄依賴。</li></ul>
 <hr />
 <h2>五、完整雙向資料合約藍圖（<code>schema/trip.ts</code>）</h2>
-<p>為了讓優惠精算師與介面設計師在分開開發時 100% 對得起來，這次把<strong>輸入合約（<code>TripInput</code>）</strong>與<strong>輸出合約（<code>TripPlanResult</code>）</strong>一次定齊：</p>
+<p>為了讓優惠精算師與介面設計師在分開開發時 100% 對得起來，這次把<strong>輸入合約（<code>TripInput</code>）</strong>與<strong>輸出合約（<code>TripPlanResult</code>）</strong>一次定齊。<strong>一切以 <code>schema/trip.ts</code> 為準</strong>：下面是方便閱讀的型別版本，實際檔案用 Zod 定義、型別由 <code>z.infer</code> 自動推導；Zod 另外會擋下的情況列在藍圖下方。</p>
 <div class="code-card"><div class="code-header"><span class="code-lang">TypeScript 合約藍圖 (schema/trip.ts)</span><button type="button" class="copy-btn" data-copy-target="code-block-1" aria-label="複製內容"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>一鍵複製</span></button></div><pre><code id="code-block-1">export type OriginRegion =
   | &#x27;taipei_keelung&#x27; | &#x27;taoyuan_hsinchu_miaoli&#x27; | &#x27;taichung_changhua_nantou&#x27;
   | &#x27;chiayi_yunlin&#x27; | &#x27;tainan&#x27; | &#x27;kaohsiung&#x27; | &#x27;pingtung&#x27; | &#x27;yilan_hualien_taitung&#x27;;
@@ -407,10 +407,12 @@ export type IdentityKey =
   | &#x27;senior65Plus&#x27;
   | &#x27;child3To12&#x27;
   | &#x27;infantUnder3&#x27;
-  | &#x27;disabledWithCompanion&#x27;;
+  | &#x27;disabled&#x27;           // 身心障礙者本人
+  | &#x27;disabledCompanion&#x27;; // 必要陪伴者（每位身障旅客最多 1 位）
 
+// 每個欄位都是「人頭數」
 export type IdentityCounts = Record&lt;IdentityKey, number&gt; &amp; {
-  offshoreResident: boolean;
+  offshoreResidentCount: number; // 設籍澎金馬等離島的人數
 };
 
 export type TravelPassOwned = {
@@ -445,8 +447,8 @@ export type TransportLeg = {
   mode: TransportPreference;
   from: string;
   to: string;
-  departureTime?: string;
-  arrivalTime?: string;
+  departureTime?: string; // HH:MM
+  arrivalTime?: string;   // HH:MM
   estimatedMinutes: number;
   source: &#x27;tdx_live&#x27; | &#x27;tdx_static&#x27; | &#x27;ferry_fallback&#x27; | &#x27;distance_estimate&#x27;;
   sourceUrl?: string;
@@ -483,8 +485,8 @@ export type DayStop = {
 
 export type DayPlan = {
   dayIndex: number;
-  date: string;
-  weekday: number;
+  date: string;    // YYYY-MM-DD
+  weekday: number; // 0=週日 ~ 6=週六，必須等於 date 的星期
   isHolidayOrWeekend: boolean;
   seaRisk?: { level: SeaRiskLevel; waveHeightM?: number; warning?: string };
   legs: TransportLeg[];
@@ -516,6 +518,7 @@ export type BudgetBreakdown = {
     reason: string;
   };
   perIdentitySplit: IdentityCostShare[];
+  roundingRemainderTwd: number; // 尾差：整數分帳除不盡的差額，可為負
 };
 
 export type ReviewWarning = {
@@ -530,10 +533,13 @@ export type TripPlanResult = {
   days: DayPlan[];
   budget: BudgetBreakdown;
   reviewWarnings: ReviewWarning[];
-  aiSummary?: string;
+  aiSummary?: string; // 150 字內
   modeUsed: &#x27;ai_assisted&#x27; | &#x27;rule_only&#x27;;
   generatedAt: string;
 };</code></pre></div>
+<h3>合約驗證規則（Zod 會擋下的情況）</h3>
+<ul><li><strong>金額一律整數新台幣</strong>：所有 <code>*Twd</code> 欄位都必須是整數，不接受 333.33 這種小數。</li><li><strong>分帳要能對回總額</strong>：<code>Σ(count × totalPerPersonTwd) + roundingRemainderTwd = discountedTotalTwd</code>。例如 1,000 元 3 人分，每人 333 元、尾差 1 元。</li><li><strong>身分人數</strong>：至少要有 1 位成人、大專生、65 歲以上長輩或身障旅客，不能只有孩童；<code>disabledCompanion</code> 不能多於 <code>disabled</code>；<code>offshoreResidentCount</code> 不能多於同行總人數。</li><li><strong>時間與日期</strong>：景點與交通段的時間一律 <code>HH:MM</code>（24 小時制）；<code>DayPlan.weekday</code> 必須等於 <code>date</code> 的星期（0＝週日）。</li><li><strong>AI 白話導讀</strong>：<code>aiSummary</code> 最多 150 字；閘道發現導讀裡有輸入沒有的數字，就整段不用，前端改顯示規則版文案。</li></ul>
+<blockquote><strong>2026/11/28 合約更新</strong>：<code>disabledWithCompanion</code> 拆成 <code>disabled</code> 與 <code>disabledCompanion</code>；<code>offshoreResident</code>（是或否）改成 <code>offshoreResidentCount</code>（人數）；<code>BudgetBreakdown</code> 新增 <code>roundingRemainderTwd</code>。優惠精算師的引擎輸出、介面設計師的身分計數器與分帳畫面都要跟著調整。</blockquote>
 <hr />
 <h2>六、共同協作默契與 4 人多 AI 協作鐵律</h2>
 <ol><li><strong>各自守住主場資料夾（CODEOWNERS 邊界）</strong>：<ul><li>架構師顧 <code>schema/</code>、<code>.github/</code>、根目錄設定檔與主機閘道。</li><li>路線情報員顧 <code>services/</code> 與 <code>data/</code>。</li><li>優惠精算師顧 <code>engine/</code>。</li><li>介面設計師顧 <code>src/</code>。</li><li>共用資料夾 <code>data/curated/</code> 僅修改各自認領的區域檔案。少欄位先由架構師對齊再改 <code>schema/trip.ts</code>，禁止私下各自加欄位。</li></ul></li><li><strong>根目錄依賴鎖定（禁止自行安裝套件）</strong>：<ul><li>根目錄 <code>package.json</code> 與 <code>package-lock.json</code> 已預裝常用套件（<code>leaflet</code>、<code>react-leaflet</code>、<code>zod</code>、<code>lucide-react</code>、<code>vite-plugin-pwa</code> 等），並由 <code>.github/CODEOWNERS</code> 鎖定由架構師維護。</li><li>非架構師分支禁止自行執行 <code>npm install</code> 改動依賴檔案；若開發時發現缺少必要套件，請告知架構師統一更新至 <code>main</code>。</li></ul></li><li><strong>禁止直推 <code>main</code>，啟用 <code>protect-main</code> 分支保護</strong>：<ul><li>倉庫已啟用 GitHub 分支保護規則 <code>protect-main</code>（需 1 位審核、需 Code Owners 審核、需通過 CI 檢查、禁止 force push）。</li><li>所有成員（包含各自的 AI 夥伴）嚴禁在 <code>main</code> 直接提交或推送，一律建立 <code>feat/&lt;角色&gt;-&lt;主題&gt;</code> 分支進行開發。</li><li>使用者或 AI 準備儲存/推送時，可透過 <code>/backup</code> 技能或標準 Git 流程自動切分支並建立 Pull Request。</li></ul></li><li><strong>推送前必跑本機三項檢查</strong>：<ul><li>任何分支推送前必須於本機執行並通過：</li></ul></li><li><code>npm run typecheck</code>（TypeScript 型別檢查 0 錯誤）</li><li><code>npx vitest run</code>（單元測試全數通過）</li><li><code>npm run build</code>（Vite 建置成功）<ul><li>以 <code>git diff --stat origin/main</code> 確認未越界修改其他成員的主場目錄或共用 <code>schema/</code>。</li></ul></li><li><strong>先拿同一份 <code>mockTripData.ts</code> 平行開工</strong>：合約定案當天，三條開發線同時開工，彼此完全不用互相等待。</li></ol>

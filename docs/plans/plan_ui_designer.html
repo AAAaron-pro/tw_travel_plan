@@ -281,7 +281,7 @@
   <div class="page-shell">
     <nav class="top-nav" aria-label="計畫書快速切換">
       <div class="nav-group">
-        <a class="nav-link " href="./master_project_plan.html">
+        <a class="nav-link " href="./index.html">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
           <span>團隊總計畫書</span>
         </a>
@@ -321,7 +321,7 @@
 
 1. 【目錄、合約與依賴邊界】
    - 只在 src/ 目錄內建立與修改檔案，絕對不要修改 schema/、services/、engine/ 或根目錄 package.json。
-   - 所需套件（leaflet, react-leaflet, @types/leaflet, zod, lucide-react, vite-plugin-pwa）已預裝完成，請勿執行 npm install。
+   - 所需套件（leaflet, react-leaflet, @types/leaflet, zod, lucide-react, vite-plugin-pwa, jsdom, @testing-library/react, @testing-library/dom）已預裝完成，請勿執行 npm install。
    - 開發初期直接 import schema/trip.ts 與 schema/mockTripData.ts 的完整 TripPlanResult 假資料實作全部互動（預留呼叫 engine/mutations 的 callback 介面）。
    - 禁止在 main 分支直接 commit，所有更動必須在 feat/ui-&lt;主題&gt; 分支完成並透過 PR 提交。
 
@@ -337,7 +337,7 @@
    - 平板橫向 (&gt;= 1024px) 採左時間軸＋右地圖雙欄；手機與直向平板提供清楚的「列表 / 地圖」切換，避免地圖擠壓表單與文字。
 
 4. 【完整頁面與台灣口語文案】
-   - 3 步驟精簡調查表：含出發地、目的地（本島/離島）、住宿等級與間數、同團混搭身分計數器、交通複選與節奏；頂部選配「一句話讓主機幫我填」（能處理 missingFields 高亮補填，並在降級時溫和引導改用表單）。
+   - 3 步驟精簡調查表：含出發地、目的地（本島/離島）、住宿等級與間數、同團混搭身分計數器（身障旅客與必要陪伴者分開計數，陪伴者不可多於身障旅客；另外問設籍離島的有幾位）、交通複選與節奏；頂部選配「一句話讓主機幫我填」（能處理 missingFields 高亮補填，並在降級時溫和引導改用表單）。
    - 結果儀表板：
      (a) 選配的 150 字主機白話導讀（僅在 aiSummary 存在時顯示）。
      (b) 預算總覽卡：原價 vs. 折後省下金額、「改平日省更多」提示條、以及可展開的「各身分每人 AA 分帳明細表」。
@@ -347,7 +347,7 @@
    - 全面檢查文案，確保自然台灣日常口語，完全不含翻譯腔與網路黑話。
 
 5. 【自我檢查測試】
-   - 使用 Vitest + Testing Library 測試：加減同團身分人數與修改出發地更新狀態、降級訊號下仍可完整送出、單點替換與切雨備按鈕事件正確觸發、AA 分帳抽屜可正常展開。執行 `npm run typecheck`、`npm test` 與 `npm run build` 確保 0 錯誤。</code></pre></div>
+   - 使用 Vitest + Testing Library 測試：加減同團身分人數與修改出發地更新狀態、降級訊號下仍可完整送出、單點替換與切雨備按鈕事件正確觸發、AA 分帳抽屜可正常展開（有尾差時要顯示，讓各身分加總對得上總額）。元件測試檔開頭加 `// @vitest-environment jsdom`。執行 `npm run typecheck`、`npm test` 與 `npm run build` 確保 0 錯誤。</code></pre></div>
     </main>
   </div>
 
